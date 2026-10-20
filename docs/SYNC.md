@@ -1,5 +1,9 @@
 # Versioned offline bundles (format 1)
 
+The separate [public distribution proposal](PUBLIC_DISTRIBUTION.md) adds an
+explicit format-3 candidate protocol. It does not change private defaults or
+authorize publication; format-1/2 classification remains unchanged.
+
 Requires POSIX, Python 3.11+ and Git for export only; no dependencies or network.
 A version is the full upstream Git commit SHA, not a mutable tag. The bundle
 is a single JSON file containing a manifest and UTF-8 content, with SHA-256

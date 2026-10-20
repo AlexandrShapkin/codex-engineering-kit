@@ -1,0 +1,82 @@
+{
+  "admin_agents_collision": "unmanaged file collision: AGENTS.md",
+  "copied_file_sha256_before_and_after": {
+    ".github/workflows/ci.yml": "f351d1cbe5bb3e50ac4b4e0bb8482032d1e3ec202dcdffb5cb4a24fb66655af3",
+    ".github/workflows/release.yml": "0fa8337103446011e0fd0d6ba900c6989c85f5ecea83f5c473f036800ad6f686",
+    "AGENTS.md": "7e913bf1ec69aae13aca123e2b18c204708745345dc66ffd9bb6b1202b3610be",
+    "docs/ARCHITECTURE.md": "f7901b9d1fe448b53a04a0fbbc11834ab1070bd455194b0ff5e97608eb7ebb42",
+    "docs/INDEX.md": "7dbed415930091963c80ff553263085b496fd9a8cb1960fc139d624116180f68",
+    "docs/stages.toml": "d1ab6568433b0a9e3215437a865f8ff55637165e6c838932977058ef6c847583",
+    "docs/stages/A1.md": "972ca5504b679e40c592a867c6ae21ab7a4b6705a0d00c6c97a17f7f12a73688",
+    "docs/stages/BG1.md": "a078e1fa9a078aa28a4f7cf210812dceabf4c5062783e6a1dc7b8d2c1b4e51b6",
+    "docs/stages/C2.md": "36255a6ed6069c83427cf9feaa8f478b5a81a21d319a727a2ac3a93d3f837eb3",
+    "docs/stages/DX2.md": "cc1a21fd10d0dd1bc3dd4d43139b1c35bf9df10ad481e7085865d78d3c65100c",
+    "docs/stages/F1.md": "ab5e8c75a26d381a8413b86460806a77a963fa61446978b0cbf6419a84106564",
+    "docs/stages/INDEX.md": "ea78040f45b40444e9a2f8b9ad96503c30c0cdd8727d72bcb2da75cf8e66f7fd",
+    "docs/stages/M5.md": "bd3464e1d593cd7b00a2b2b37500174dc9fce0bdfe69def7dfbe40069496efab",
+    "docs/stages/M6.md": "2718343baca02d3bed14a2e1b1520476381a5c783867deabe31b58d165229b42",
+    "docs/stages/M7.md": "306ad9b10290a4f909c92174fbd48c07858869c78a87281bf1c232ca9cb7f6df",
+    "docs/stages/READY1.md": "22b5a96e9f2866fd05783cc25d3adee96f725470ded02f74f4281e823d18200b",
+    "docs/stages/RF1.md": "ea19fde8c5d40ef3fe50c1591056ce24fc0b43fa1458f8521a2b264849e3ef75",
+    "docs/stages/VS1.md": "ded9dad94d8be13d93a37d87803e5064ffcd822d1a37128d5c2e24a8d9723b00",
+    "docs/stages/WF1.md": "61a93b95857f20f31e8abe91ca3fbb08c09d73a7610144dd6302e72f46d24466",
+    "justfile": "aa64682f04966d55acfd4b31d6ea897e406aa028e37aceea01ea56bef0499e7f"
+  },
+  "existing_interface": false,
+  "kit_initial_changes": [
+    {
+      "action": "create",
+      "path": ".engineering-kit/PROFILE.md"
+    },
+    {
+      "action": "create",
+      "path": ".engineering-kit/contract/AGENT_COMMON.md"
+    },
+    {
+      "action": "create",
+      "path": ".engineering-kit/contract/DEVELOPMENT_INTERFACE.md"
+    },
+    {
+      "action": "create",
+      "path": ".engineering-kit/skills/ek-context/SKILL.md"
+    },
+    {
+      "action": "create",
+      "path": ".engineering-kit/skills/ek-pr-closeout/SKILL.md"
+    },
+    {
+      "action": "create",
+      "path": ".engineering-kit/skills/ek-verify/SKILL.md"
+    },
+    {
+      "action": "create",
+      "path": ".engineering-kit/lock.json"
+    }
+  ],
+  "native_build_and_migration_ci": "UNVERIFIED; no Rust commands executed",
+  "native_bytes_unchanged": true,
+  "native_gates_retained": [
+    "just ci",
+    "ubuntu-latest",
+    "windows-latest"
+  ],
+  "private_baseline_reproducibility": {
+    "admin": {
+      "bundle_sha256": "6e9090724ae85a4dfef759e5c43bd3be98dc808f1cc9362b6a3469984425effc",
+      "repeatable": true,
+      "upstream": "0a53f56dba841675b3203a76e33594fee1a73b9f"
+    },
+    "kit": {
+      "bundle_sha256": "217ff9a4913ba3fbde5c84832c47c50c707b945b664e78466017630db3e5b817",
+      "repeatable": true,
+      "upstream": "e647d9d535eb9b55f2a6df55c2bf5e4b9a47957d"
+    }
+  },
+  "real_private_channels_rejected": [
+    "kit",
+    "admin"
+  ],
+  "rustcraft_read_only_head": "5b09106c814ac1ee59e8b8e3d2e0688180115964",
+  "scope": "disposable local copies only",
+  "synthetic_public_bytes": true
+}

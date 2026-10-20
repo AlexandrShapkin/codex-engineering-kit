@@ -106,8 +106,23 @@ def load(data):
         raise SyncError('invalid JSON') from exc
 
 
-def metadata(obj, channel='kit'):
+def metadata(obj, channel='kit', public=False):
     channel_lock(channel)
+    if public:
+        fields = {'format', 'publication', 'channel', 'owner', 'generator', 'review', 'source'}
+        if (not isinstance(obj, dict) or set(obj) != fields
+                or type(obj['format']) is not int or obj['format'] != 3
+                or obj['publication'] != 'public-safe' or obj['channel'] != channel
+                or obj['owner'] != ('AlexandrShapkin/project-template' if channel == 'admin'
+                                    else 'AlexandrShapkin/codex-engineering-kit')
+                or not sha(obj['generator'], 40) or not sha(obj['review'])):
+            raise SyncError('invalid public distribution provenance')
+        source = metadata(obj['source'], channel)
+        expected = (ADMIN_PATHS if channel == 'admin' else
+                    {PREFIX + n for n in SOURCES} | {PREFIX + 'PROFILE.md'})
+        if set(source['files']) != set(expected):
+            raise SyncError('public distribution requires exact managed file set')
+        return obj
     fields = {'format', 'upstream', 'profile', 'files'}
     if channel == 'admin':
         fields |= {'publication', 'owner'}
@@ -131,20 +146,25 @@ def metadata(obj, channel='kit'):
     return obj
 
 
-def bundle_read(path, channel='kit'):
-    obj = load(read(location(Path(path).parent, Path(path).name)) or b'')
+def bundle_read(path, channel='kit', public_bundle_sha256=None):
+    raw = read(location(Path(path).parent, Path(path).name)) or b''
+    public = public_bundle_sha256 is not None
+    if public and (not sha(public_bundle_sha256) or digest(raw) != public_bundle_sha256):
+        raise SyncError('approved public bundle SHA-256 mismatch')
+    obj = load(raw)
     if not isinstance(obj, dict) or set(obj) != {'manifest', 'contents'}:
         raise SyncError('invalid bundle')
-    manifest = metadata(obj['manifest'], channel)
+    manifest = metadata(obj['manifest'], channel, public)
+    source = manifest['source'] if public else manifest
     contents = obj['contents']
-    if not isinstance(contents, dict) or set(contents) != set(manifest['files']):
+    if not isinstance(contents, dict) or set(contents) != set(source['files']):
         raise SyncError('bundle file set mismatch')
     data = {}
     for name, value in contents.items():
         if not isinstance(value, str):
             raise SyncError('invalid file content')
         data[name] = value.encode('utf-8')
-        if digest(data[name]) != manifest['files'][name]:
+        if digest(data[name]) != source['files'][name]:
             raise SyncError('bundle hash mismatch')
     return manifest, data
 
@@ -182,15 +202,17 @@ def export(source, revision, profile, output, channel='kit'):
     return manifest
 
 
-def plan(root, bundle, channel='kit'):
+def plan(root, bundle, channel='kit', public_bundle_sha256=None):
     lock = channel_lock(channel)
     root = Path(os.path.abspath(root))
     if not root.is_dir():
         raise SyncError('target root must exist')
-    manifest, contents = bundle_read(bundle, channel)
+    manifest, contents = bundle_read(bundle, channel, public_bundle_sha256)
+    public = public_bundle_sha256 is not None
+    source = manifest['source'] if public else manifest
     lock_data = read(location(root, lock))
-    old = metadata(load(lock_data), channel) if lock_data is not None else None
-    previous = old['files'] if old else {}
+    old = metadata(load(lock_data), channel, public) if lock_data is not None else None
+    previous = (old['source'] if public else old)['files'] if old else {}
     changes = []
     snapshots = {lock: lock_data}
     for name in sorted(set(previous) | set(contents)):
@@ -214,12 +236,12 @@ def plan(root, bundle, channel='kit'):
                             'manifest': manifest, 'changes': changes,
                             'before': {n: digest(v) if v is not None else None
                                        for n, v in snapshots.items()}}))
-    return {'changes': changes, 'plan_sha256': token, 'upstream': manifest['upstream'],
-            'profile': manifest['profile']}, contents
+    return {'changes': changes, 'plan_sha256': token, 'upstream': source['upstream'],
+            'profile': source['profile']}, contents
 
 
-def write(root, bundle, allowed, token, channel='kit'):
-    result, contents = plan(root, bundle, channel)
+def write(root, bundle, allowed, token, channel='kit', public_bundle_sha256=None):
+    result, contents = plan(root, bundle, channel, public_bundle_sha256)
     paths = {c['path'] for c in result['changes']}
     if token != result['plan_sha256'] or set(allowed) != paths:
         raise SyncError('exact plan SHA and exact --allow path set required')

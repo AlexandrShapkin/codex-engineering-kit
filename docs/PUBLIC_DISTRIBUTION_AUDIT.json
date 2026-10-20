@@ -1,0 +1,177 @@
+{
+  "files": [
+    {
+      "bytes": 71,
+      "channel": "kit",
+      "classification": "PUBLIC-SAFE",
+      "destination": ".engineering-kit/PROFILE.md",
+      "finding": "Minimal profile, local AGENTS first; no installations or commands.",
+      "frontmatter": null,
+      "markdown_links": [],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "84e63ea30041e1c68c70d569be93005978dcc9530f77c7a8ebbaa2c6cd735eb0",
+      "source": "profiles/sync/minimal.md",
+      "upstream": "e647d9d535eb9b55f2a6df55c2bf5e4b9a47957d"
+    },
+    {
+      "bytes": 4333,
+      "channel": "kit",
+      "classification": "REDACT/REFACTOR",
+      "destination": ".engineering-kit/contract/AGENT_COMMON.md",
+      "finding": "Frozen legacy policy; relative .github entrypoint resolves outside installed namespace. Require explicit provenance-only use and consumer link review.",
+      "frontmatter": null,
+      "markdown_links": [
+        ".github/DEVELOPMENT_INTERFACE.md"
+      ],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "3465b1b6a879859b3b327466f4c069d25a8cf50c0b0dd9b2bf4e5a75959714be",
+      "source": "contract/AGENT_COMMON.md",
+      "upstream": "e647d9d535eb9b55f2a6df55c2bf5e4b9a47957d"
+    },
+    {
+      "bytes": 14160,
+      "channel": "kit",
+      "classification": "REDACT/REFACTOR",
+      "destination": ".engineering-kit/contract/DEVELOPMENT_INTERFACE.md",
+      "finding": "Historical codex-smart Issue #169 URL, named products/platforms and legacy duplicate lifecycle; review disclosure and relocated relative links without changing frozen v0.1 bytes.",
+      "frontmatter": null,
+      "markdown_links": [
+        "https://github.com/AlexandrShapkin/codex-smart/issues/169",
+        ".github/DEVELOPMENT_INTERFACE.md"
+      ],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "f1b7f088b1475d29b09830e459570544e57323c9ab11744ade805aa31e2b29c6",
+      "source": "contract/DEVELOPMENT_INTERFACE.md",
+      "upstream": "e647d9d535eb9b55f2a6df55c2bf5e4b9a47957d"
+    },
+    {
+      "bytes": 688,
+      "channel": "kit",
+      "classification": "PUBLIC-SAFE",
+      "destination": ".engineering-kit/skills/ek-context/SKILL.md",
+      "finding": "Generic instruction-only reference; pinned contract means consumer-selected active Template policy. No implicit skill activation.",
+      "frontmatter": "name: ek-context\ndescription: Select bounded, relevant context before an authorized engineering change.",
+      "markdown_links": [],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "8ff6fd5cb4597418ba52a84cca775ed9765ea97c832473fd12b4e8406ca5b482",
+      "source": "skills/ek-context/SKILL.md",
+      "upstream": "e647d9d535eb9b55f2a6df55c2bf5e4b9a47957d"
+    },
+    {
+      "bytes": 707,
+      "channel": "kit",
+      "classification": "PUBLIC-SAFE",
+      "destination": ".engineering-kit/skills/ek-pr-closeout/SKILL.md",
+      "finding": "Generic instruction-only review/cleanup rules; no executable hooks.",
+      "frontmatter": "name: ek-pr-closeout\ndescription: Collect PR evidence and audit workspace artifacts before closeout.",
+      "markdown_links": [],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "e70f3629b31b3c9d64a80d092bef906691c6bad499e01f40f3bc0d1362fcb0fb",
+      "source": "skills/ek-pr-closeout/SKILL.md",
+      "upstream": "e647d9d535eb9b55f2a6df55c2bf5e4b9a47957d"
+    },
+    {
+      "bytes": 646,
+      "channel": "kit",
+      "classification": "REDACT/REFACTOR",
+      "destination": ".engineering-kit/skills/ek-verify/SKILL.md",
+      "finding": "Names RelayForge legacy live Cargo path. Owner must review disclosure or refactor technical source in Kit.",
+      "frontmatter": "name: ek-verify\ndescription: Plan and record exact-head test and security evidence without bypassing native gates.",
+      "markdown_links": [],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "953af86f8b3581ef8acb5310c34bd0a2359761bb2ba2f4ee1a4be2aaed2a3de8",
+      "source": "skills/ek-verify/SKILL.md",
+      "upstream": "e647d9d535eb9b55f2a6df55c2bf5e4b9a47957d"
+    },
+    {
+      "bytes": 3421,
+      "channel": "admin",
+      "classification": "REDACT/REFACTOR",
+      "destination": ".github/DEVELOPMENT_INTERFACE.md",
+      "finding": "Canonical owner metadata is intended provenance; names RelayForge runtime. Review disclosure before classifying source bytes.",
+      "frontmatter": null,
+      "markdown_links": [],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "44e0ef0c5277184ab12b5a203acb1a6b16160ad508dd998bc2f7aae054a5d07f",
+      "source": ".github/DEVELOPMENT_INTERFACE.md",
+      "upstream": "0a53f56dba841675b3203a76e33594fee1a73b9f"
+    },
+    {
+      "bytes": 1054,
+      "channel": "admin",
+      "classification": "PUBLIC-SAFE",
+      "destination": ".github/ISSUE_TEMPLATE/task.yml",
+      "finding": "Generic Task form metadata; no server labels, scripts or administrative mutations.",
+      "frontmatter": null,
+      "markdown_links": [],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "bdfc374f9e01ab38a1190200f6f32a19162cd83d2779aface88b16562f3152e2",
+      "source": ".github/ISSUE_TEMPLATE/task.yml",
+      "upstream": "0a53f56dba841675b3203a76e33594fee1a73b9f"
+    },
+    {
+      "bytes": 599,
+      "channel": "admin",
+      "classification": "PUBLIC-SAFE",
+      "destination": ".github/pull_request_template.md",
+      "finding": "Generic evidence template; no prefilled private IDs or credentials.",
+      "frontmatter": null,
+      "markdown_links": [],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "045e913eb01dbb3333307d91451553d0bfd5d4d57696a3aa92ad6033e2c50830",
+      "source": ".github/pull_request_template.md",
+      "upstream": "0a53f56dba841675b3203a76e33594fee1a73b9f"
+    },
+    {
+      "bytes": 2008,
+      "channel": "admin",
+      "classification": "REDACT/REFACTOR",
+      "destination": ".project-template/OWNERSHIP.md",
+      "finding": "Explicit both-distributions-private policy; cannot silently relabel or redact generated bytes. Requires canonical Template review and new independently versioned source.",
+      "frontmatter": null,
+      "markdown_links": [],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "06e75bcf87324f42db1aa51a5987f8b87cf73a71314007cc80313205d9e44d3d",
+      "source": ".project-template/OWNERSHIP.md",
+      "upstream": "0a53f56dba841675b3203a76e33594fee1a73b9f"
+    },
+    {
+      "bytes": 705,
+      "channel": "admin",
+      "classification": "PUBLIC-SAFE",
+      "destination": "AGENTS.md",
+      "finding": "Requires consumer docs/INDEX.md and AGENTS.local.md outside managed set; verify these before adoption. Existing root entrypoint must collide.",
+      "frontmatter": null,
+      "markdown_links": [
+        ".github/DEVELOPMENT_INTERFACE.md",
+        "docs/INDEX.md",
+        "AGENTS.local.md"
+      ],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "772d646745ba0d7ff2df84b61e11258f6b500ebde570114640dc6c6e777a895c",
+      "source": "AGENTS.md",
+      "upstream": "0a53f56dba841675b3203a76e33594fee1a73b9f"
+    },
+    {
+      "bytes": 389,
+      "channel": "admin",
+      "classification": "REDACT/REFACTOR",
+      "destination": "docs/WORKFLOW.md",
+      "finding": "UPGRADING.md, PROJECT.md and AGENTS.local.md are external consumer prerequisites. UPGRADING.md currently describes private-only delivery; reconcile canonical instructions before public adoption.",
+      "frontmatter": null,
+      "markdown_links": [
+        "../.github/DEVELOPMENT_INTERFACE.md",
+        "../AGENTS.local.md",
+        "UPGRADING.md"
+      ],
+      "release_gate": "BLOCKED: no owner authorization or selected redistribution license",
+      "sha256": "db0ea92e2c9e5a849892d92685b08c0a1c5884d391946028643e996144e939b8",
+      "source": "docs/WORKFLOW.md",
+      "upstream": "0a53f56dba841675b3203a76e33594fee1a73b9f"
+    }
+  ],
+  "format": 1,
+  "kit_admin_implementation": "21cf2914cb0a1c904ca8c783a36723786373b600",
+  "profile": "minimal; other profiles need a new exact-byte audit",
+  "purpose": "Private staging audit; not a PUBLIC-SAFE release review"
+}
