@@ -87,3 +87,47 @@ a verified Git snapshot/backup before retrying. Do not auto-reset or auto-delete
 conflicts. Keep consumer changes in a bounded branch and commit the reviewed
 installed files/lock together. Installation/live use and independent technical
 acceptance remain separate from offline tests.
+
+## Administrative channel (format 2; proposed compatibility extension)
+
+`--channel admin` reuses the same plan/write engine, filesystem checks, exact
+permissions and crash limits. It uses `.project-template/lock.json` independently
+of the unchanged format-1 Kit lock. Export with:
+
+```sh
+python3 -B scripts/ek.py bundle --channel admin --source /trusted/project-template \
+  --revision FULL_TEMPLATE_SHA --profile administrative --output /tmp/admin.json
+python3 -B scripts/ek.py sync plan --channel admin --root /consumer --bundle /tmp/admin.json
+# Review contents, changes and digest. Explicitly list every changed path:
+python3 -B scripts/ek.py sync write --channel admin --root /consumer \
+  --bundle /tmp/admin.json --plan-sha256 DIGEST --allow AGENTS.md \
+  --allow .project-template/lock.json
+# The example permission list is sufficient only if those are the only changes.
+```
+
+The fixed allowlist is AGENTS.md, .github/DEVELOPMENT_INTERFACE.md,
+.github/ISSUE_TEMPLATE/task.yml, .github/pull_request_template.md,
+docs/WORKFLOW.md and .project-template/OWNERSHIP.md. Export requires all of them
+as regular tracked files. Subset/removal bundles still require explicit path
+permissions, including each deletion. Local extensions, native CI, architecture,
+security and testing documents cannot be managed by this channel.
+
+Format 2 records upstream full SHA, per-file hashes, canonical owner
+`AlexandrShapkin/project-template` and `publication: private`. This classification
+is mandatory and does not authorize public redistribution. Offline operations
+cannot establish remote visibility: operators must block public adoption until
+separately authorized. No network updater, remote repository operations or
+publication switch exists. Hashes do not authenticate the source owner.
+
+Kit v0.1 contracts are retained byte-for-byte for existing consumers/checkers.
+They are frozen legacy administrative reference, not the source of future shared
+workflow changes. The canonical policy moves to project-template; migrate each
+consumer in a separate reviewed PR, preserving native gates and explicitly
+removing legacy activation. Existing root files collide on initial adoption;
+never delete a lock or overwrite local instructions to bypass this protection.
+
+Each update is a consumer branch/Draft PR with reviewed provenance, complete diff,
+native CI, independent review and explicit owner merge. Rollback reuses a retained
+old bundle and the same plan/write permissions. For partial I/O failure restore
+files and lock from the pre-update verified snapshot before replanning. Neither
+channel implicitly upgrades the other; retain both full SHAs and both bundles.

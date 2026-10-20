@@ -58,14 +58,16 @@ def main(argv: list[str] | None = None) -> int:
     checks = subs.add_parser("checks")
     checks.add_argument("--profile", required=True)
     bundle = subs.add_parser("bundle")
+    bundle.add_argument("--channel", choices=("kit", "admin"), default="kit")
     bundle.add_argument("--source", type=Path, default=Path.cwd())
     bundle.add_argument("--revision", required=True)
-    bundle.add_argument("--profile", choices=PROFILES, required=True)
+    bundle.add_argument("--profile", choices=(*PROFILES, "administrative"), required=True)
     bundle.add_argument("--output", type=Path, required=True)
     sync = subs.add_parser("sync")
     sync_subs = sync.add_subparsers(dest="operation", required=True)
     for operation in ("plan", "write"):
         command = sync_subs.add_parser(operation)
+        command.add_argument("--channel", choices=("kit", "admin"), default="kit")
         command.add_argument("--root", type=Path, required=True)
         command.add_argument("--bundle", type=Path, required=True)
         if operation == "write":
@@ -74,12 +76,12 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
     try:
         if args.command == "bundle":
-            result = export(args.source, args.revision, args.profile, args.output)
+            result = export(args.source, args.revision, args.profile, args.output, args.channel)
         elif args.command == "sync":
             if args.operation == "plan":
-                result, _ = plan(args.root, args.bundle)
+                result, _ = plan(args.root, args.bundle, args.channel)
             else:
-                result = write(args.root, args.bundle, args.allow, args.plan_sha256)
+                result = write(args.root, args.bundle, args.allow, args.plan_sha256, args.channel)
         elif args.command == "status":
             result = observe(args.root)
         elif args.command == "context":
