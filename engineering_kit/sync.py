@@ -19,6 +19,17 @@ class SyncError(ValueError):
 
 PREFIX = '.engineering-kit/'
 LOCK = PREFIX + 'lock.json'
+ADMIN_LOCK = '.project-template/lock.json'
+ADMIN_PATHS = frozenset(('AGENTS.md', '.github/DEVELOPMENT_INTERFACE.md',
+    '.github/ISSUE_TEMPLATE/task.yml', '.github/pull_request_template.md',
+    'docs/WORKFLOW.md', '.project-template/OWNERSHIP.md'))
+
+
+def channel_lock(channel):
+    if channel not in ('kit', 'admin'):
+        raise SyncError('unknown synchronization channel')
+    return ADMIN_LOCK if channel == 'admin' else LOCK
+
 PROFILES = ('minimal', 'backend', 'infrastructure', 'research')
 SOURCES = ('contract/AGENT_COMMON.md', 'contract/DEVELOPMENT_INTERFACE.md',
            'skills/ek-context/SKILL.md', 'skills/ek-verify/SKILL.md',
@@ -37,7 +48,12 @@ def sha(value, length=64):
     return isinstance(value, str) and re.fullmatch('[0-9a-f]{%d}' % length, value)
 
 
-def managed(path):
+def managed(path, channel='kit'):
+    channel_lock(channel)
+    if channel == 'admin':
+        if not isinstance(path, str) or path not in ADMIN_PATHS:
+            raise SyncError('invalid administrative managed path')
+        return path
     if (not isinstance(path, str) or not path.startswith(PREFIX)
             or '\\' in path or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_/.' for c in path)
             or any(p in ('', '.', '..') for p in path.split('/'))
@@ -90,14 +106,23 @@ def load(data):
         raise SyncError('invalid JSON') from exc
 
 
-def metadata(obj):
-    if (not isinstance(obj, dict) or set(obj) != {'format', 'upstream', 'profile', 'files'}
-            or type(obj['format']) is not int or obj['format'] != 1
-            or not sha(obj['upstream'], 40) or obj['profile'] not in PROFILES
+def metadata(obj, channel='kit'):
+    channel_lock(channel)
+    fields = {'format', 'upstream', 'profile', 'files'}
+    if channel == 'admin':
+        fields |= {'publication', 'owner'}
+    if (not isinstance(obj, dict) or set(obj) != fields
+            or type(obj['format']) is not int
+            or obj['format'] != (2 if channel == 'admin' else 1)
+            or not sha(obj['upstream'], 40)
+            or obj['profile'] not in (('administrative',) if channel == 'admin' else PROFILES)
             or not isinstance(obj['files'], dict) or not obj['files']):
         raise SyncError('invalid manifest')
+    if channel == 'admin' and (obj['publication'] != 'private'
+            or obj['owner'] != 'AlexandrShapkin/project-template'):
+        raise SyncError('invalid administrative provenance/classification')
     for name, value in obj['files'].items():
-        managed(name)
+        managed(name, channel)
         if not sha(value):
             raise SyncError('invalid file hash')
     for name in obj['files']:
@@ -106,11 +131,11 @@ def metadata(obj):
     return obj
 
 
-def bundle_read(path):
+def bundle_read(path, channel='kit'):
     obj = load(read(location(Path(path).parent, Path(path).name)) or b'')
     if not isinstance(obj, dict) or set(obj) != {'manifest', 'contents'}:
         raise SyncError('invalid bundle')
-    manifest = metadata(obj['manifest'])
+    manifest = metadata(obj['manifest'], channel)
     contents = obj['contents']
     if not isinstance(contents, dict) or set(contents) != set(manifest['files']):
         raise SyncError('bundle file set mismatch')
@@ -124,8 +149,9 @@ def bundle_read(path):
     return manifest, data
 
 
-def export(source, revision, profile, output):
-    if not sha(revision, 40) or profile not in PROFILES:
+def export(source, revision, profile, output, channel='kit'):
+    channel_lock(channel)
+    if not sha(revision, 40) or profile not in (('administrative',) if channel == 'admin' else PROFILES):
         raise SyncError('full commit SHA and known profile required')
     executable = shutil.which('git')
     if executable is None:
@@ -137,6 +163,8 @@ def export(source, revision, profile, output):
     contents = {}
     sources = {PREFIX + name: name for name in SOURCES}
     sources[PREFIX + 'PROFILE.md'] = 'profiles/sync/' + profile + '.md'
+    if channel == 'admin':
+        sources = {name: name for name in sorted(ADMIN_PATHS)}
     for destination, name in sources.items():
         # Git tree mode is part of provenance: never export a symlink/blob alias.
         entry = git('ls-tree', revision, '--', name).decode()
@@ -145,22 +173,26 @@ def export(source, revision, profile, output):
         contents[destination] = git('show', revision + ':' + name).decode('utf-8')
     manifest = {'format': 1, 'upstream': revision, 'profile': profile,
                 'files': {n: digest(v.encode()) for n, v in contents.items()}}
+    if channel == 'admin':
+        manifest.update(format=2, publication='private', owner='AlexandrShapkin/project-template')
+    metadata(manifest, channel)
     path = location(Path(output).parent, Path(output).name)
     with path.open('xb') as stream:
         stream.write(encoded({'manifest': manifest, 'contents': contents}))
     return manifest
 
 
-def plan(root, bundle):
+def plan(root, bundle, channel='kit'):
+    lock = channel_lock(channel)
     root = Path(os.path.abspath(root))
     if not root.is_dir():
         raise SyncError('target root must exist')
-    manifest, contents = bundle_read(bundle)
-    lock_data = read(location(root, LOCK))
-    old = metadata(load(lock_data)) if lock_data is not None else None
+    manifest, contents = bundle_read(bundle, channel)
+    lock_data = read(location(root, lock))
+    old = metadata(load(lock_data), channel) if lock_data is not None else None
     previous = old['files'] if old else {}
     changes = []
-    snapshots = {LOCK: lock_data}
+    snapshots = {lock: lock_data}
     for name in sorted(set(previous) | set(contents)):
         current = read(location(root, name))
         snapshots[name] = current
@@ -173,9 +205,9 @@ def plan(root, bundle):
         if desired != current:
             changes.append({'path': name, 'action': 'delete' if desired is None else
                             ('create' if current is None else 'update')})
-    contents[LOCK] = encoded(manifest)
-    if contents[LOCK] != lock_data:
-        changes.append({'path': LOCK, 'action': 'create' if lock_data is None else 'update'})
+    contents[lock] = encoded(manifest)
+    if contents[lock] != lock_data:
+        changes.append({'path': lock, 'action': 'create' if lock_data is None else 'update'})
     identity = root.stat()
     token = digest(encoded({'consumer': {'path': str(root), 'device': identity.st_dev,
                                          'inode': identity.st_ino},
@@ -186,8 +218,8 @@ def plan(root, bundle):
             'profile': manifest['profile']}, contents
 
 
-def write(root, bundle, allowed, token):
-    result, contents = plan(root, bundle)
+def write(root, bundle, allowed, token, channel='kit'):
+    result, contents = plan(root, bundle, channel)
     paths = {c['path'] for c in result['changes']}
     if token != result['plan_sha256'] or set(allowed) != paths:
         raise SyncError('exact plan SHA and exact --allow path set required')
