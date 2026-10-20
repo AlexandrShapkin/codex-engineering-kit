@@ -1,4 +1,4 @@
-"""Bounded Engineering Kit observation CLI. Only explicit github-get may use network."""
+"""Offline Engineering Kit observation CLI. No network or native check execution."""
 from __future__ import annotations
 
 import argparse
@@ -9,7 +9,6 @@ import sys
 
 from engineering_kit.contract import ContractError, requirements
 from engineering_kit.git_observe import ObservationError, observe
-from engineering_kit.github_public import GithubReadError, get_public
 
 
 def _context(root: Path) -> dict[str, object]:
@@ -57,10 +56,6 @@ def main(argv: list[str] | None = None) -> int:
     subs.add_parser("doctor")
     checks = subs.add_parser("checks")
     checks.add_argument("--profile", required=True)
-    public = subs.add_parser("github-get")
-    public.add_argument("resource", choices=("issue", "pr", "run", "commit"))
-    public.add_argument("repo")
-    public.add_argument("identifier")
     args = p.parse_args(argv)
     try:
         if args.command == "status":
@@ -69,11 +64,9 @@ def main(argv: list[str] | None = None) -> int:
             result = _context(args.root)
         elif args.command == "doctor":
             result = _doctor()
-        elif args.command == "checks":
-            result = _checks(args.profile)
         else:
-            result = get_public(args.repo, args.resource, args.identifier)
-    except (ContractError, ObservationError, GithubReadError) as exc:
+            result = _checks(args.profile)
+    except (ContractError, ObservationError) as exc:
         print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False))
         return 1
     print(json.dumps({"ok": True, "data": result}, ensure_ascii=False))

@@ -1,12 +1,10 @@
-"""Offline adversarial tests for Git observation and fixed-host GitHub GET."""
-import http.client
-import json
+"""Offline adversarial tests for the local-only CLI and Git observation."""
 import os
+from contextlib import redirect_stderr, redirect_stdout
+import io
 import signal
-import threading
 from pathlib import Path
 import shutil
-import socket
 import subprocess
 import sys
 import tempfile
@@ -16,7 +14,6 @@ from unittest import mock
 
 from engineering_kit.cli import main
 from engineering_kit.git_observe import ObservationError, _env, observe, _git
-from engineering_kit.github_public import GithubReadError, get_public
 
 
 def local_git(directory, *args):
@@ -145,13 +142,21 @@ class GitFixture(unittest.TestCase):
                 observe(self.root)
         self.assertNotIn("PRIVATE_TOKEN", str(error.exception))
 
+    def test_non_repository_returns_controlled_error(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ObservationError, "metadata command failed"):
+                observe(Path(directory))
+
 
 class CliTests(unittest.TestCase):
     def test_offline_commands_never_spawn_or_open_network(self):
         with tempfile.TemporaryDirectory() as tmp:
             (Path(tmp) / "README.md").write_text("synthetic")
             with mock.patch("subprocess.Popen", side_effect=AssertionError("spawn")), \
-                 mock.patch("http.client.HTTPSConnection", side_effect=AssertionError("network")):
+                 mock.patch("socket.socket", side_effect=AssertionError("network")), \
+                 mock.patch("socket.create_connection", side_effect=AssertionError("network")), \
+                 mock.patch("signal.signal", side_effect=AssertionError("handler mutation")), \
+                 mock.patch("signal.setitimer", create=True, side_effect=AssertionError("timer mutation")):
                 self.assertEqual(main(["doctor"]), 0)
                 self.assertEqual(main(["context", "--root", tmp]), 0)
                 self.assertEqual(main(["checks", "--profile", "rustcraft"]), 0)
@@ -162,271 +167,29 @@ class CliTests(unittest.TestCase):
             with self.assertRaisesRegex(ObservationError, "unavailable"):
                 observe(Path("/tmp"))
 
-    def test_invalid_github_identifiers_do_not_contact_network(self):
-        bad = [("issue", "../secrets"), ("run", "0"),
-               ("commit", "main"), ("pr", "100000000000000000")]
-        with mock.patch("http.client.HTTPSConnection", side_effect=AssertionError("network")):
-            for resource, identifier in bad:
-                with self.subTest(resource=resource, identifier=identifier):
-                    with self.assertRaises(GithubReadError):
-                        get_public("owner/repo", resource, identifier)
-            with self.assertRaises(GithubReadError):
-                get_public("owner/../repo", "issue", "1")
+    def test_removed_github_get_is_rejected_without_side_effects(self):
+        for resource, identifier in (("issue", "7"), ("commit", "a" * 40),
+                                     ("pr", "../secret"), ("run", "0")):
+            with self.subTest(resource=resource), \
+                 mock.patch("subprocess.Popen", side_effect=AssertionError("spawn")), \
+                 mock.patch("socket.socket", side_effect=AssertionError("network")), \
+                 mock.patch("signal.signal", side_effect=AssertionError("handler mutation")), \
+                 mock.patch("signal.setitimer", create=True, side_effect=AssertionError("timer mutation")), \
+                 redirect_stdout(io.StringIO()) as output, \
+                 redirect_stderr(io.StringIO()) as errors:
+                with self.assertRaises(SystemExit) as result:
+                    main(["github-get", resource, "owner/repo", identifier])
+                self.assertEqual(result.exception.code, 2)
+                self.assertEqual(output.getvalue(), "")
+                self.assertIn("invalid choice", errors.getvalue())
 
-
-class HttpTests(unittest.TestCase):
-    def fake_connection(self, body=b'{"number":7,"state":"open","title":"example"}',
-                        status=200, content_type="application/json"):
-        response = mock.Mock()
-        response.status = status
-        response.getheader.side_effect = lambda n, d=None: (
-            content_type if n == "Content-Type" else d)
-        response.read1.side_effect = [body, b""]
-        connection = mock.Mock()
-        connection.sock = mock.Mock()
-        connection.getresponse.return_value = response
-        return connection, response
-
-    def test_exact_host_get_no_auth_proxy_redirect(self):
-        conn, resp = self.fake_connection()
-        with mock.patch("http.client.HTTPSConnection", return_value=conn) as ctor:
-            item = get_public("owner/repo", "issue", "7")
-        self.assertEqual(item["number"], 7)
-        self.assertEqual(ctor.call_args.args[0], "api.github.com")
-        self.assertLessEqual(ctor.call_args.kwargs["timeout"], 10)
-        self.assertEqual(conn.request.call_args.args[:2],
-                         ("GET", "/repos/owner/repo/issues/7"))
-        self.assertNotIn("Authorization", conn.request.call_args.kwargs["headers"])
-        conn.close.assert_called_once()
-
-    def test_identity_mismatch_rejected(self):
-        conn, _ = self.fake_connection(body=b'{"number":8}')
-        with mock.patch("http.client.HTTPSConnection", return_value=conn):
-            with self.assertRaisesRegex(GithubReadError, "mismatch"):
-                get_public("owner/repo", "issue", "7")
-
-    def test_redirect_rejected(self):
-        conn, _ = self.fake_connection(status=302)
-        with mock.patch("http.client.HTTPSConnection", return_value=conn):
-            with self.assertRaisesRegex(GithubReadError, "redirect"):
-                get_public("owner/repo", "issue", "7")
-
-    def test_oversize_response_rejected(self):
-        conn, _ = self.fake_connection(body=b"a" * (64 * 1024 + 1))
-        with mock.patch("http.client.HTTPSConnection", return_value=conn):
-            with self.assertRaisesRegex(GithubReadError, "too large"):
-                get_public("owner/repo", "issue", "7")
-
-    def test_slow_chunk_overall_deadline_not_individual_socket_timeout(self):
-        conn, resp = self.fake_connection()
-        def slow_read(*args):
-            time.sleep(0.055)
-            return b'{"number":7}'
-        resp.read1.side_effect = slow_read
-        with mock.patch("engineering_kit.github_public.MAX_SECONDS", 0.03), \
-             mock.patch("http.client.HTTPSConnection", return_value=conn):
-            with self.assertRaisesRegex(GithubReadError, "deadline"):
-                get_public("owner/repo", "issue", "7")
-        conn.close.assert_called_once()
-
-    def test_real_truncated_chunked_http_response_converted(self):
-        left, right = socket.socketpair()
-        self.addCleanup(left.close)
-        self.addCleanup(right.close)
-        right.sendall(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"
-                      b"Transfer-Encoding: chunked\r\n\r\n"
-                      b"20\r\n{\"number\":7}")
-        right.shutdown(socket.SHUT_WR)
-        response = http.client.HTTPResponse(left)
-        self.addCleanup(response.close)
-        response.begin()
-        conn = mock.Mock(sock=left)
-        conn.getresponse.return_value = response
-        with mock.patch("http.client.HTTPSConnection", return_value=conn):
-            with self.assertRaises(GithubReadError):
-                get_public("owner/repo", "issue", "7")
-
-    def test_extremely_deep_json_caught(self):
-        deep = b'{"number":7,"data":' + b"[" * 10000 + b"0" + b"]" * 10000 + b"}"
-        conn, resp = self.fake_connection(body=deep)
-        with mock.patch("http.client.HTTPSConnection", return_value=conn):
-            with self.assertRaisesRegex(GithubReadError, "nested"):
-                get_public("owner/repo", "issue", "7")
-
-    def _fragmented_response(self, initial, delayed):
-        # Real HTTPResponse parsing atop a local socketpair. No Internet.
-        left, right = socket.socketpair()
-        released = threading.Event()
-        def writer():
-            try:
-                right.sendall(initial)
-                time.sleep(0.19)
-                released.set()
-                right.sendall(delayed)
-            except OSError:
-                released.set()
-            finally:
-                right.close()
-        thread = threading.Thread(target=writer, daemon=True)
-        thread.start()
-        response = http.client.HTTPResponse(left)
-        connection = mock.Mock(sock=left)
-        def headers():
-            response.begin()
-            return response
-        connection.getresponse.side_effect = headers
-        self.addCleanup(thread.join, 0.5)
-        self.addCleanup(response.close)
-        self.addCleanup(left.close)
-        return connection, released
-
-    def test_deadline_interrupts_real_slow_headers(self):
-        connection, released = self._fragmented_response(
-            b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n",
-            b"Content-Length: 12\r\n\r\n{\"number\":7}")
-        with mock.patch("engineering_kit.github_public.MAX_SECONDS", 0.045), \
-             mock.patch("http.client.HTTPSConnection", return_value=connection):
-            with self.assertRaisesRegex(GithubReadError, "deadline"):
-                get_public("owner/repo", "issue", "7")
-        self.assertFalse(released.is_set(),
-                         "HTTP header parser blocked past whole-request deadline")
-
-    def test_deadline_interrupts_real_slow_chunk_size(self):
-        connection, released = self._fragmented_response(
-            b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"
-            b"Transfer-Encoding: chunked\r\n\r\n1",
-            b"\r\n0\r\n0\r\n\r\n")
-        with mock.patch("engineering_kit.github_public.MAX_SECONDS", 0.045), \
-             mock.patch("http.client.HTTPSConnection", return_value=connection):
-            with self.assertRaisesRegex(GithubReadError, "deadline"):
-                get_public("owner/repo", "issue", "7")
-        self.assertFalse(released.is_set(),
-                         "HTTP chunk parser blocked past whole-request deadline")
-
-    def _run_isolated_signal_case(self, snippet):
-        """Run signal-manipulating checks outside the unittest process."""
-        command = [sys.executable, "-c", snippet]
-        proc = subprocess.run(
-            command, stdin=subprocess.DEVNULL, capture_output=True,
-            text=True, timeout=5,
-            cwd=str(Path(__file__).resolve().parent.parent))
-        self.assertEqual(proc.returncode, 0,
-                         "signal subprocess returned " + str(proc.returncode)
-                         + "; stderr: " + proc.stderr)
-
-    def test_blocked_sigalrm_rejected_without_pending_timer(self):
-        self._run_isolated_signal_case("""
-import os, signal
-from unittest import mock
-from engineering_kit.github_public import get_public, GithubReadError
-assert signal.getsignal(signal.SIGALRM) is signal.SIG_DFL
-mask = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
-try:
-    assert signal.SIGALRM not in signal.sigpending()
-    with mock.patch("http.client.HTTPSConnection",
-                    side_effect=AssertionError("network must not start")):
-        try:
-            get_public("owner/repo", "issue", "7")
-        except GithubReadError as e:
-            assert "blocked or pending" in str(e)
-        else:
-            raise AssertionError("blocked SIGALRM accepted")
-    assert signal.SIGALRM not in signal.sigpending()
-    assert signal.getsignal(signal.SIGALRM) is signal.SIG_DFL
-    assert signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0)
-finally:
-    signal.pthread_sigmask(signal.SIG_SETMASK, mask)
-""")
-
-    def test_pending_sigalrm_preserved_without_replacing_handler(self):
-        self._run_isolated_signal_case("""
-import os, signal
-from unittest import mock
-from engineering_kit.github_public import get_public, GithubReadError
-delivered = []
-def owned_handler(*args):
-    delivered.append("delivered")
-signal.signal(signal.SIGALRM, owned_handler)
-mask = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
-try:
-    os.kill(os.getpid(), signal.SIGALRM)
-    assert signal.SIGALRM in signal.sigpending()
-    with mock.patch("http.client.HTTPSConnection",
-                    side_effect=AssertionError("network must not start")):
-        try:
-            get_public("owner/repo", "issue", "7")
-        except GithubReadError as e:
-            assert "blocked or pending" in str(e)
-        else:
-            raise AssertionError("pending SIGALRM accepted")
-    assert signal.getsignal(signal.SIGALRM) is owned_handler
-    assert signal.SIGALRM in signal.sigpending()
-    assert signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0)
-finally:
-    signal.pthread_sigmask(signal.SIG_SETMASK, mask)
-assert delivered == ["delivered"]
-""")
-
-    def test_existing_custom_sigalrm_handler_remains_authoritative(self):
-        self._run_isolated_signal_case("""
-import os, signal
-from unittest import mock
-from engineering_kit.github_public import get_public, GithubReadError
-delivered = []
-def owned_handler(*args):
-    delivered.append("delivered")
-signal.signal(signal.SIGALRM, owned_handler)
-assert signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0)
-with mock.patch("http.client.HTTPSConnection",
-                side_effect=AssertionError("network must not start")):
-    try:
-        get_public("owner/repo", "issue", "7")
-    except GithubReadError as e:
-        assert "existing SIGALRM handler" in str(e)
-    else:
-        raise AssertionError("external signal handler taken over")
-assert signal.getsignal(signal.SIGALRM) is owned_handler
-assert signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0)
-os.kill(os.getpid(), signal.SIGALRM)
-assert delivered == ["delivered"]
-""")
-
-    def test_hard_deadline_refuses_threaded_use_without_signal_side_effects(self):
-        from engineering_kit.github_public import _hard_deadline
-        original = signal.getsignal(signal.SIGALRM)
-        problems = []
-        def worker():
-            try:
-                with _hard_deadline(0.05):
-                    pass
-            except GithubReadError as exc:
-                problems.append(str(exc))
-        th = threading.Thread(target=worker)
-        th.start()
-        th.join()
-        self.assertTrue(problems)
-        self.assertIs(original, signal.getsignal(signal.SIGALRM))
-
-    def test_hard_deadline_preserves_existing_process_alarm(self):
-        from engineering_kit.github_public import _hard_deadline
-        # Respect an existing application's signal timer; never replace it.
-        old = signal.getitimer(signal.ITIMER_REAL)
-        signal.setitimer(signal.ITIMER_REAL, 1.0)
-        try:
-            with self.assertRaisesRegex(GithubReadError, "existing process alarm"):
-                with _hard_deadline(0.04):
-                    pass
-            self.assertGreater(signal.getitimer(signal.ITIMER_REAL)[0], 0)
-        finally:
-            signal.setitimer(signal.ITIMER_REAL, *old)
-
-    def test_unsupported_response_socket_refused(self):
-        conn, resp = self.fake_connection()
-        conn.sock = None
-        resp.fp = None
-        with mock.patch("http.client.HTTPSConnection", return_value=conn):
-            with self.assertRaisesRegex(GithubReadError, "enforce socket"):
-                get_public("owner/repo", "issue", "7")
+    def test_help_exposes_only_local_commands(self):
+        with redirect_stdout(io.StringIO()) as output:
+            with self.assertRaises(SystemExit) as result:
+                main(["--help"])
+        self.assertEqual(result.exception.code, 0)
+        self.assertIn("{status,context,doctor,checks}", output.getvalue())
+        self.assertNotIn("github-get", output.getvalue())
 
 
 if __name__ == "__main__":
