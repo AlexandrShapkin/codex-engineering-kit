@@ -238,6 +238,7 @@ class HttpTests(unittest.TestCase):
                       b"20\r\n{\"number\":7}")
         right.shutdown(socket.SHUT_WR)
         response = http.client.HTTPResponse(left)
+        self.addCleanup(response.close)
         response.begin()
         conn = mock.Mock(sock=left)
         conn.getresponse.return_value = response

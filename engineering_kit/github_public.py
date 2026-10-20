@@ -114,6 +114,10 @@ def _read_json(path: str) -> dict[str, object]:
         except GithubReadError:
             raise
         except (http.client.HTTPException, OSError, ValueError, RecursionError) as exc:
+            # http.client may wrap an interrupt from chunk-size/trailer parsing
+            # as IncompleteRead; preserve the deadline error classification.
+            if time.monotonic() >= deadline:
+                raise GithubReadError("GitHub request exceeded overall deadline") from exc
             raise GithubReadError("public GitHub GET failed or response malformed") from exc
         finally:
             if conn is not None:
