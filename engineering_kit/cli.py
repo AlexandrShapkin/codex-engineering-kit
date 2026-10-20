@@ -1,4 +1,4 @@
-"""Offline Engineering Kit observation CLI. No network or native check execution."""
+"""Offline Engineering Kit CLI. Explicit bundle/sync writes; no native check execution."""
 from __future__ import annotations
 
 import argparse
@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import sys
 
+from engineering_kit.sync import SyncError, export, plan, write, PROFILES
 from engineering_kit.contract import ContractError, requirements
 from engineering_kit.git_observe import ObservationError, observe
 
@@ -56,9 +57,30 @@ def main(argv: list[str] | None = None) -> int:
     subs.add_parser("doctor")
     checks = subs.add_parser("checks")
     checks.add_argument("--profile", required=True)
+    bundle = subs.add_parser("bundle")
+    bundle.add_argument("--source", type=Path, default=Path.cwd())
+    bundle.add_argument("--revision", required=True)
+    bundle.add_argument("--profile", choices=PROFILES, required=True)
+    bundle.add_argument("--output", type=Path, required=True)
+    sync = subs.add_parser("sync")
+    sync_subs = sync.add_subparsers(dest="operation", required=True)
+    for operation in ("plan", "write"):
+        command = sync_subs.add_parser(operation)
+        command.add_argument("--root", type=Path, required=True)
+        command.add_argument("--bundle", type=Path, required=True)
+        if operation == "write":
+            command.add_argument("--allow", action="append", default=[])
+            command.add_argument("--plan-sha256", required=True)
     args = p.parse_args(argv)
     try:
-        if args.command == "status":
+        if args.command == "bundle":
+            result = export(args.source, args.revision, args.profile, args.output)
+        elif args.command == "sync":
+            if args.operation == "plan":
+                result, _ = plan(args.root, args.bundle)
+            else:
+                result = write(args.root, args.bundle, args.allow, args.plan_sha256)
+        elif args.command == "status":
             result = observe(args.root)
         elif args.command == "context":
             result = _context(args.root)
@@ -66,7 +88,7 @@ def main(argv: list[str] | None = None) -> int:
             result = _doctor()
         else:
             result = _checks(args.profile)
-    except (ContractError, ObservationError) as exc:
+    except (ContractError, ObservationError, SyncError, OSError, UnicodeError) as exc:
         print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False))
         return 1
     print(json.dumps({"ok": True, "data": result}, ensure_ascii=False))

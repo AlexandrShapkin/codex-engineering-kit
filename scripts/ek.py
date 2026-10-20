@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Engineering Kit read-only CLI entrypoint; no install required."""
+"""Engineering Kit offline CLI entrypoint; no install required."""
 from pathlib import Path
 import sys
 

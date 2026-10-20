@@ -36,4 +36,4 @@ The optional CLI provides local `status`, `context`, `doctor` and `checks`
 observations. See [CLI usage and limits](docs/CLI.md). GitHub GET is deferred
 from v0.1; the CLI has no network command or GitHub-tool fallback.
 
-GitHub retrieval, pinned bundles, updaters and consumer templates remain outside this v0.1 slice. No general orchestrator, MCP server, credentials, Codex global config, RelayForge grants, deployment or automatic external mutation is included.
+Versioned offline bundles and explicitly authorized sync are documented in [bundle adoption, update and rollback](docs/SYNC.md). GitHub retrieval, network updaters and consumer templates remain outside this slice. No general orchestrator, MCP server, credentials, Codex global config, RelayForge grants, deployment or automatic external mutation is included.

@@ -42,3 +42,7 @@ explicitly authorized tool. No tool installation or additional access is
 implied. Without that evidence, exact-head CI and GitHub state remain
 UNVERIFIED; these local observations do not replace native checks, independent
 review or merge/runtime authorization.
+
+Versioned bundle export and explicitly authorized `sync plan` / `sync write` are
+available separately; see [bundle lifecycle and limits](SYNC.md). The observation
+commands above retain their read-only behavior.
