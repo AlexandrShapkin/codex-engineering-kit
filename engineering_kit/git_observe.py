@@ -69,10 +69,26 @@ def observe(root: Path) -> dict[str, object]:
         raise ObservationError("Git HEAD is not a complete SHA")
     branch = _git(executable, root, ["symbolic-ref", "-q", "--short", "HEAD"],
                   detached_ok=True).decode("utf-8", errors="replace").strip()
-    data = _git(executable, root,
-                ["status", "--porcelain=v1", "-z", "--untracked-files=all"])
-    entries = [name for name in data.split(b"\0") if name]
-    return {"repo_root": actual, "head_sha": sha,
-            "branch": branch or None, "detached": not bool(branch),
-            "dirty_entry_count": len(entries),
-            "dirty": bool(entries), "note": "Git status observed; no cleanup performed"}
+
+    # Deliberately never call git status, diff-files, ls-files --modified,
+    # or any content-comparing working-tree command. Those can invoke
+    # repository-controlled filter.*.clean commands despite disabled hooks.
+    # The staged comparison uses HEAD/index only; untracked listing only
+    # reads paths and ignores. Unstaged tracked changes are UNVERIFIED.
+    staged_data = _git(executable, root,
+                       ["diff-index", "--cached", "--name-only", "-z", "HEAD", "--"])
+    untracked_data = _git(executable, root,
+                          ["ls-files", "-z", "--others", "--exclude-standard"])
+    staged = sum(bool(item) for item in staged_data.split(b"\0"))
+    untracked = sum(bool(item) for item in untracked_data.split(b"\0"))
+    return {
+        "repo_root": actual,
+        "head_sha": sha,
+        "branch": branch or None,
+        "detached": not bool(branch),
+        "staged_entry_count": staged,
+        "untracked_entry_count": untracked,
+        "known_pending_changes": bool(staged or untracked),
+        "unstaged_tracked_changes": "UNVERIFIED",
+        "note": "No working-tree content inspection or repository filter execution",
+    }

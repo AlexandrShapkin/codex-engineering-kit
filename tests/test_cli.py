@@ -34,7 +34,8 @@ class CliTests(unittest.TestCase):
 
     def test_observation_fixed_argv_and_git_environment(self):
         sha = "0" * 40
-        responses = iter([sha.encode() + b"\n", b"main\n", b" M file.txt\0?? foo.txt\0"])
+        responses = iter([sha.encode() + b"\n", b"main\n",
+                          b"src/a.py\0", b"new.txt\0"])
         calls = []
         def runner(args, **kwargs):
             calls.append((args, kwargs))
@@ -44,15 +45,49 @@ class CliTests(unittest.TestCase):
         with mock.patch("shutil.which", return_value="/usr/bin/git"), \
              mock.patch("subprocess.run", side_effect=runner):
             result = observe(Path("/tmp"))
-        self.assertEqual(result["dirty_entry_count"], 2)
+        self.assertEqual(result["staged_entry_count"], 1)
+        self.assertEqual(result["untracked_entry_count"], 1)
+        self.assertEqual(result["unstaged_tracked_changes"], "UNVERIFIED")
         self.assertEqual(result["head_sha"], sha)
-        self.assertEqual(len(calls), 4)
+        self.assertEqual(len(calls), 5)
         for args, kwargs in calls:
             self.assertEqual(args[0], "/usr/bin/git")
             self.assertIn("--no-optional-locks", args)
             self.assertEqual(kwargs["env"]["GIT_OPTIONAL_LOCKS"], "0")
-            self.assertFalse(kwargs["shell"] if "shell" in kwargs else False)
+            self.assertFalse(kwargs.get("shell", False))
             self.assertEqual(kwargs["stdin"], subprocess.DEVNULL)
+            self.assertNotIn("status", args)
+            self.assertNotIn("diff-files", args)
+            self.assertNotIn("--modified", args)
+
+    def test_git_filters_cannot_execute_during_observation(self):
+        # Git status/diff-files can run clean filters from .gitattributes.
+        # The observation routine must not trigger a repo-defined filter.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            def git(*args):
+                env = {k: v for k, v in os.environ.items()
+                       if not k.startswith("GIT_")}
+                env.update({"GIT_CONFIG_NOSYSTEM": "1",
+                            "GIT_CONFIG_GLOBAL": os.devnull})
+                subprocess.run(["git", "-C", tmp, *args], check=True,
+                               capture_output=True, env=env)
+            git("init", "-q")
+            git("config", "user.email", "synthetic@example.test")
+            git("config", "user.name", "Synthetic")
+            (root / ".gitattributes").write_text("data filter=untrusted\n")
+            (root / "data").write_text("old\n")
+            git("add", ".gitattributes", "data")
+            git("commit", "-qm", "fixture")
+            # Only a marker would be created by the untrusted filter.
+            marker = root / "FILTER_WAS_RUN"
+            git("config", "filter.untrusted.clean",
+                "sh -c 'echo called > FILTER_WAS_RUN; cat'")
+            (root / "data").write_text("changed\n")
+            result = observe(root)
+            self.assertEqual(result["unstaged_tracked_changes"], "UNVERIFIED")
+            self.assertFalse(marker.exists(), "repository clean filter executed!")
+
 
     def test_unavailable_git_is_not_installed(self):
         with mock.patch("shutil.which", return_value=None):
