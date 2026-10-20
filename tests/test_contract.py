@@ -158,9 +158,13 @@ class ContractTests(unittest.TestCase):
                 path.rename(self.path / "saved-agent")
                 path.symlink_to(outside)
             return native_open(name, flags, *args, **kwargs)
-        with mock.patch("os.open", side_effect=swap):
-            with self.assertRaisesRegex(ContractError, "symlink"):
-                check(self.path, "rustcraft")
+        # The mocked os.open remains descriptor-aware; preserve the platform
+        # capability declaration so the test reaches the leaf-opening race.
+        with mock.patch("os.open", side_effect=swap) as wrapped_open:
+            with mock.patch.object(os, "supports_dir_fd",
+                                   os.supports_dir_fd | {wrapped_open}):
+                with self.assertRaisesRegex(ContractError, "symlink"):
+                    check(self.path, "rustcraft")
         self.assertTrue(swapped)
 
     def test_reverse_markers_are_controlled_failure(self):
