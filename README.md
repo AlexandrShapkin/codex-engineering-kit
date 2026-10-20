@@ -17,7 +17,7 @@ The copied `contract/DEVELOPMENT_INTERFACE.md` preserves its original references
 
 ## First slice
 
-- `contract/`: the canonical shared interface and common AGENTS.md fragment.
+- `contract/`: frozen legacy interface and agent fragment for compatibility/provenance.
 - `engineering_kit/contract.py`: offline source checker. Product-specific gate markers live as data in `profiles/products.json`, not in executable if/else branches.
 - `skills/`: three instruction-only skills.
 - `tests/` and read-only GitHub Actions Python 3.11–3.13.
@@ -46,3 +46,7 @@ new administrative policy is canonical in `AlexandrShapkin/project-template`.
 Independent tags/Releases, compatibility and authority gates are specified in
 [release qualification](docs/RELEASING.md). The [public-readiness audit](docs/PUBLIC_READINESS.md)
 remains blocked by license/rights and separate owner decisions; no version is released.
+
+Kit follows the Template-owned [administrative interface](.github/DEVELOPMENT_INTERFACE.md).
+Read [AGENTS.local.md](AGENTS.local.md) for stronger Kit gates and
+[docs/INDEX.md](docs/INDEX.md) for context. Legacy contract snapshots remain unchanged.
