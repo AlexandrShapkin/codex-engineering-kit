@@ -4,6 +4,10 @@ from __future__ import annotations
 import http.client
 import json
 import re
+import os
+import signal
+import threading
+from contextlib import contextmanager
 import time
 
 MAX_BYTES = 64 * 1024
@@ -24,64 +28,96 @@ def _remaining(deadline: float) -> float:
     return seconds
 
 
+
+@contextmanager
+def _hard_deadline(seconds: float):
+    """Interrupt HTTP internals, including readline() for chunk sizes/headers.
+
+    SIGALRM is process-global, so this bounded CLI transport only works in the
+    POSIX main thread and refuses to disturb any existing application alarm.
+    Never silently fall back to per-socket idle timeouts.
+    """
+    if (os.name != "posix" or not hasattr(signal, "setitimer")
+            or threading.current_thread() is not threading.main_thread()):
+        raise GithubReadError("hard HTTPS deadline unsupported on this platform/thread")
+    try:
+        current = signal.getitimer(signal.ITIMER_REAL)
+        previous = signal.getsignal(signal.SIGALRM)
+    except (OSError, ValueError) as exc:
+        raise GithubReadError("cannot establish hard HTTPS deadline") from exc
+    if current != (0.0, 0.0):
+        raise GithubReadError("existing process alarm prevents safe HTTPS deadline")
+
+    def interrupt(signum, frame):
+        raise GithubReadError("GitHub request exceeded overall deadline")
+
+    signal.signal(signal.SIGALRM, interrupt)
+    try:
+        signal.setitimer(signal.ITIMER_REAL, max(0.000001, seconds))
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous)
+
 def _read_json(path: str) -> dict[str, object]:
-    """Connection, headers and each read share one monotonic deadline.
+    """Hard POSIX timer interrupts header/chunk parsing at one shared deadline.
 
     http.client uses a fixed TLS host, no env proxies, redirects, cookies or
-    automatic credentials. Unsupported response transports fail closed.
+    automatic credentials. Non-main-thread/non-POSIX callers fail closed.
     """
     deadline = time.monotonic() + MAX_SECONDS
-    conn = None
-    try:
-        conn = http.client.HTTPSConnection(HOST, timeout=_remaining(deadline))
-        conn.request("GET", path, headers={
-            "Accept": "application/vnd.github+json",
-            "User-Agent": "codex-engineering-kit/0.1",
-        })
-        _remaining(deadline)
-        response = conn.getresponse()
-        _remaining(deadline)
-        if response.status != 200:
-            if 300 <= response.status < 400:
-                raise GithubReadError("GitHub redirect refused")
-            raise GithubReadError("GitHub request unsuccessful")
-        if "json" not in response.getheader("Content-Type", "").lower():
-            raise GithubReadError("non-JSON GitHub response")
-        content_length = response.getheader("Content-Length")
-        if content_length is not None and content_length.isdecimal() and int(content_length) > MAX_BYTES:
-            raise GithubReadError("GitHub response too large")
-        body = bytearray()
-        # HTTPResponse may own the socket after will_close; refreshing its
-        # timeout before each read stops slow-drip responses at the deadline.
-        socket = conn.sock
-        if socket is None:
-            stream = response.fp
-            socket = getattr(getattr(stream, "raw", None), "_sock", None)
-        if socket is None or not hasattr(socket, "settimeout"):
-            raise GithubReadError("cannot enforce socket deadline safely")
-        while True:
-            socket.settimeout(_remaining(deadline))
-            chunk = response.read1(min(8192, MAX_BYTES + 1 - len(body)))
-            _remaining(deadline)
-            if not chunk:
-                break
-            body.extend(chunk)
-            if len(body) > MAX_BYTES:
-                raise GithubReadError("GitHub response too large")
+    with _hard_deadline(MAX_SECONDS):
+        conn = None
         try:
-            item = json.loads(body)
-        except (ValueError, UnicodeError, RecursionError) as exc:
-            raise GithubReadError("invalid or excessively nested GitHub JSON") from exc
-        if not isinstance(item, dict):
-            raise GithubReadError("unexpected GitHub response shape")
-        return item
-    except GithubReadError:
-        raise
-    except (http.client.HTTPException, OSError, ValueError, RecursionError) as exc:
-        raise GithubReadError("public GitHub GET failed or response malformed") from exc
-    finally:
-        if conn is not None:
-            conn.close()
+            conn = http.client.HTTPSConnection(HOST, timeout=_remaining(deadline))
+            conn.request("GET", path, headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": "codex-engineering-kit/0.1",
+            })
+            _remaining(deadline)
+            response = conn.getresponse()
+            _remaining(deadline)
+            if response.status != 200:
+                if 300 <= response.status < 400:
+                    raise GithubReadError("GitHub redirect refused")
+                raise GithubReadError("GitHub request unsuccessful")
+            if "json" not in response.getheader("Content-Type", "").lower():
+                raise GithubReadError("non-JSON GitHub response")
+            content_length = response.getheader("Content-Length")
+            if content_length is not None and content_length.isdecimal() and int(content_length) > MAX_BYTES:
+                raise GithubReadError("GitHub response too large")
+            body = bytearray()
+            # HTTPResponse may own the socket after will_close; refreshing its
+            # timeout before each read stops slow-drip responses at the deadline.
+            socket = conn.sock
+            if socket is None:
+                stream = response.fp
+                socket = getattr(getattr(stream, "raw", None), "_sock", None)
+            if socket is None or not hasattr(socket, "settimeout"):
+                raise GithubReadError("cannot enforce socket deadline safely")
+            while True:
+                socket.settimeout(_remaining(deadline))
+                chunk = response.read1(min(8192, MAX_BYTES + 1 - len(body)))
+                _remaining(deadline)
+                if not chunk:
+                    break
+                body.extend(chunk)
+                if len(body) > MAX_BYTES:
+                    raise GithubReadError("GitHub response too large")
+            try:
+                item = json.loads(body)
+            except (ValueError, UnicodeError, RecursionError) as exc:
+                raise GithubReadError("invalid or excessively nested GitHub JSON") from exc
+            if not isinstance(item, dict):
+                raise GithubReadError("unexpected GitHub response shape")
+            return item
+        except GithubReadError:
+            raise
+        except (http.client.HTTPException, OSError, ValueError, RecursionError) as exc:
+            raise GithubReadError("public GitHub GET failed or response malformed") from exc
+        finally:
+            if conn is not None:
+                conn.close()
 
 
 def get_public(repo: str, resource: str, identifier: str) -> dict[str, object]:

@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import re
+import signal
 import select
 import shutil
 import subprocess
@@ -50,7 +51,9 @@ def _git(executable: str, root: Path, args: list[str], detached_ok: bool = False
                "-c", "core.hooksPath=" + os.devnull,
                "-C", str(root), *args]
     proc = None
+    completed = False
     try:
+        # Every child is created as a fresh POSIX session/process group.
         proc = subprocess.Popen(command, stdin=subprocess.DEVNULL,
                                 stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                                 env=_env(), close_fds=True, start_new_session=True)
@@ -76,10 +79,11 @@ def _git(executable: str, root: Path, args: list[str], detached_ok: bool = False
             code = proc.wait(timeout=remaining)
         except subprocess.TimeoutExpired as exc:
             raise ObservationError("git observation timed out") from exc
+        if code != 0 and not (detached_ok and code == 1):
+            raise ObservationError("git metadata command failed")
+        completed = True
         if detached_ok and code == 1:
             return b""
-        if code:
-            raise ObservationError("git metadata command failed")
         return bytes(data)
     except (OSError, ValueError) as exc:
         if isinstance(exc, ObservationError):
@@ -87,15 +91,35 @@ def _git(executable: str, root: Path, args: list[str], detached_ok: bool = False
         raise ObservationError("git observation unavailable") from exc
     finally:
         if proc is not None:
-            if proc.poll() is None:
-                proc.kill()
+            cleanup_error = None
+            # On every failure, including a parent that has already exited,
+            # kill the entire *dedicated* process group. Children may inherit
+            # stdout and outlive their parent. proc.kill() alone is unsafe.
+            if not completed:
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                except OSError:
+                    cleanup_error = ObservationError("could not terminate Git process group")
             try:
                 proc.wait(timeout=2)
             except subprocess.TimeoutExpired:
-                raise ObservationError("git subprocess could not be reaped")
-            if proc.stdout is not None:
-                proc.stdout.close()
-
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                except OSError:
+                    cleanup_error = ObservationError("could not terminate Git process group")
+                try:
+                    proc.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    cleanup_error = ObservationError("git subprocess could not be reaped")
+            finally:
+                if proc.stdout is not None:
+                    proc.stdout.close()
+            if cleanup_error is not None:
+                raise cleanup_error
 
 def observe(root: Path) -> dict[str, object]:
     """Observe bounded metadata only; absence of objects => controlled failure."""
