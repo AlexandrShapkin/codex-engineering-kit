@@ -42,6 +42,6 @@ def check(root):
                  'exact-head GitHub CI', 'Do not execute consumer commands',
                  'Never install dependencies, fetch secrets, change global Codex config',
                  'use RDC, run a production build, deploy, merge',
-                 'owner has not selected a LICENSE'):
+                 'MIT LICENSE applies to owner-controlled source'):
         if gate not in local:
             raise ValueError('missing Kit gate: ' + gate)

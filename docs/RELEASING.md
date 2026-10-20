@@ -5,8 +5,9 @@ This file qualifies only the two proposed v0.1.0 releases and documents Kit's
 technical checker. Template #6 is the sole canonical owner of the universal
 agent/workflow rule for SemVer, narrative release notes and applicable release
 artifacts. The managed instruction is adopted through Kit #15; consumer rollout remains
-separate under #8. This is private preparation, not permission to tag, publish,
-change visibility or merge.
+separate under #8. The owner has separately authorized MIT and source visibility
+after the checks in [PUBLICATION.md](PUBLICATION.md). This release preparation
+does not authorize tags, Releases, bundle uploads or unreviewed merges.
 
 ## Version ownership and compatibility
 
@@ -63,11 +64,13 @@ for that channel. No tag automatically re-pins a lock, activates skills, changes
 AGENTS, overwrites native CI or synchronizes the two versions. Preserve crash/
 quiescent-checkout limitations documented in [SYNC](SYNC.md).
 
-The [publication audit](PUBLIC_READINESS.md) blocks actual public release. Neither
+The [historical audit](PUBLIC_READINESS.md) is superseded for source publication
+by [PUBLICATION.md](PUBLICATION.md); release assets remain separately qualified. Neither
 public source visibility nor a new SemVer tag clears old private-only policy,
 third-party rights or the twelve-file content review. Selected license/attribution
 may need separately reviewed release sidecars; never implicitly add LICENSE or
-NOTICE to the six managed-file sets or publish them before owner selection.
+NOTICE to the six managed-file sets without their own review. MIT is now selected; preserve its notice separately
+from the unchanged six-file protocols.
 
 ## Planned v0.1.0 assets
 

@@ -1,4 +1,9 @@
-# Public readiness — private audit, Issue #13
+# Public readiness — historical audit, Issue #13
+
+Historical snapshot below. Owner has since authorized MIT and public source
+visibility after safety/rights checks. See [current publication delta](PUBLICATION.md)
+for superseding decisions and actual review/visibility status. Old asset-release
+restrictions and immutable source pins are not silently changed.
 
 **Kit: BLOCKED. Template: BLOCKED.** Both remain private, no license selected,
 no real tags/Releases/assets created. The accepted anchors are Kit

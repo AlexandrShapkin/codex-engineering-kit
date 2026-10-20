@@ -1,9 +1,11 @@
 # Public-safe distribution proposal — Issue #11
 
-Private staging only. No license, release, public repository, visibility change,
-consumer modification or publication is authorized. PUBLIC-SAFE describes reviewed
-content; it is neither permission nor authentication. The private format-1/2
-protocols and the default CLI behavior remain unchanged.
+This records the format-3 mechanism and its original private-staging audit.
+The owner has now selected MIT and authorized publication of the existing
+canonical source repositories after safety/rights checks and reviewed merges;
+see [current publication status](PUBLICATION.md). No third repository is needed.
+PUBLIC-SAFE describes reviewed content, not authentication. Format-1/2 defaults
+remain private; source visibility does not approve a generated public bundle.
 
 ## Sources and release form
 

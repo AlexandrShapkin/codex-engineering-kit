@@ -1,0 +1,102 @@
+{
+  "actions": {
+    "credential_pattern_findings": 0,
+    "new_log_archives_scanned": 6,
+    "previous_scans_reused": 46,
+    "runs_inventoried": 52,
+    "unavailable": 0
+  },
+  "advertised_refs": [
+    "refs/heads/feat/admin-template-sync 21cf2914cb0a1c904ca8c783a36723786373b600",
+    "refs/heads/feat/engineering-kit-v0-cli-observation b1d2afa8bd2ba79c4887cb0a81e511bc1faba5eb",
+    "refs/heads/feat/engineering-kit-v0-contract-skills 002929dc2c8ac333b911481f1012f34bd96488ce",
+    "refs/heads/feat/issue-15-canonical-governance 1aea451f93c87b84f84da06c22c5fb64029de028",
+    "refs/heads/feat/public-safe-distribution 871b147fea37346a2f60401c51b3f489dc3d03d8",
+    "refs/heads/feat/semver-public-readiness b4b7e52bc1d44a7b4e4a3e8eb54dbfa8e7c46e3b",
+    "refs/heads/feat/versioned-bundle-sync 4f125f7bc43c9999edae80ffbcd8d5a68e15a9ab",
+    "refs/heads/main 437040274f37ebe1baff289d6f75e4addea5c287",
+    "refs/pull/10/head 21cf2914cb0a1c904ca8c783a36723786373b600",
+    "refs/pull/12/head 871b147fea37346a2f60401c51b3f489dc3d03d8",
+    "refs/pull/14/head b4b7e52bc1d44a7b4e4a3e8eb54dbfa8e7c46e3b",
+    "refs/pull/16/head 1aea451f93c87b84f84da06c22c5fb64029de028",
+    "refs/pull/2/head 002929dc2c8ac333b911481f1012f34bd96488ce",
+    "refs/pull/4/head b1d2afa8bd2ba79c4887cb0a81e511bc1faba5eb",
+    "refs/pull/6/head 4f125f7bc43c9999edae80ffbcd8d5a68e15a9ab"
+  ],
+  "all_advertised_refs_mirrored": true,
+  "audited_main": "437040274f37ebe1baff289d6f75e4addea5c287",
+  "current_reachable_object_list_sha256": "350b6e31d77821432ec5c42d58ec810ca5c17bfd8e40bc969c176aaa74033e90",
+  "date": "2026-10-21",
+  "deleted_historical_paths": [
+    "engineering_kit/github_public.py"
+  ],
+  "limitations": [
+    "bounded pattern scan and source review; no dedicated scanner installed",
+    "undisclosed/unreachable server objects and expired/deleted surfaces cannot be certified",
+    "candidate full HEAD, exact-head CI and final delta are recorded in Draft PR review handoff; this file inventories the refreshed accepted base"
+  ],
+  "metadata": {
+    "credential_pattern_findings": [],
+    "endpoint_record_counts": {
+      "/issues/comments?per_page=100": 23,
+      "/issues?state=all&per_page=100": 16,
+      "/pulls/comments?per_page=100": 0,
+      "/releases?per_page=100": 0
+    },
+    "has_discussions": false,
+    "has_pages": false,
+    "has_wiki": false,
+    "is_template": false,
+    "metadata_characters_scanned": 330332,
+    "private": true,
+    "releases": 0,
+    "retained_action_artifacts": 0,
+    "retained_action_logs": "Covered by actions counts in this audit, reusing previous verified scans",
+    "reviews": 0
+  },
+  "new_binary_objects": [],
+  "new_credential_or_private_key_findings": 0,
+  "new_location_findings": [
+    {
+      "classification": "SAFE TO PUBLISH: task-local evidence paths/examples, no secret value",
+      "lines": [
+        60,
+        62,
+        81,
+        82,
+        83,
+        86,
+        89
+      ],
+      "path": "docs/GOVERNANCE_AUDIT.md"
+    }
+  ],
+  "new_objects_since_previous_complete_audit": 38,
+  "object_types": {
+    "blob": 110,
+    "commit": 30,
+    "tree": 91
+  },
+  "other_exposure_surfaces": {
+    "accepted_main_contributor_accounts": [
+      "AlexandrShapkin"
+    ],
+    "attachment_links": 0,
+    "caches": {
+      "records": 0,
+      "status": "EMPTY"
+    },
+    "contribution_commits": [],
+    "deployments": {
+      "records": 0,
+      "status": "EMPTY"
+    },
+    "environments": {
+      "records": 0,
+      "status": "EMPTY"
+    },
+    "url_credentials": 0
+  },
+  "previous_audit_sha256": "29678a740e4351f247162d8598e2b2209b38bb4252fca09d04eb3df91e574fc5",
+  "previous_reachable_object_list_sha256": "1efdd6b3a6c8d4172aea876056395086b255ec8638e1f27794d1279656515301"
+}

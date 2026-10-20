@@ -1,3 +1,7 @@
+Source-publication update: MIT has been selected; [current publication status](PUBLICATION.md)
+records owner visibility authority and review gates. The draft release notes below
+remain an unreleased historical proposal; no tag, Release or asset is authorized.
+
 # Proposed v0.1.0 release notes — unpublished drafts
 
 Neither project has released v0.1.0. Public delivery remains blocked by license,
