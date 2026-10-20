@@ -46,6 +46,9 @@ class GitFixture(unittest.TestCase):
         (self.root / ".gitattributes").write_text("data filter=untrusted\n")
         local_git(self.root, "add", ".gitattributes")
         (self.root / "data").write_text("edited\n")
+        # Fixture setup may itself run its benign clean filter during git add;
+        # remove setup evidence before the call under test.
+        (self.root / "FILTER_WAS_RUN").unlink(missing_ok=True)
         with mock.patch("subprocess.Popen", wraps=subprocess.Popen) as popen:
             result = observe(self.root)
         self.assertEqual(result["staged_entry_count"], 1)
