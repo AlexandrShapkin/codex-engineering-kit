@@ -37,14 +37,26 @@ def _hard_deadline(seconds: float):
     POSIX main thread and refuses to disturb any existing application alarm.
     Never silently fall back to per-socket idle timeouts.
     """
-    if (os.name != "posix" or not hasattr(signal, "setitimer")
+    if (os.name != "posix" or not all(hasattr(signal, name) for name in
+            ("setitimer", "getitimer", "pthread_sigmask", "sigpending", "SIGALRM",
+             "SIG_BLOCK", "ITIMER_REAL"))
             or threading.current_thread() is not threading.main_thread()):
         raise GithubReadError("hard HTTPS deadline unsupported on this platform/thread")
     try:
-        current = signal.getitimer(signal.ITIMER_REAL)
+        # pthread_sigmask(SIG_BLOCK, empty) is a read-only query of the
+        # calling thread's mask, not a temporary unblocking of SIGALRM.
+        blocked = signal.pthread_sigmask(signal.SIG_BLOCK, set())
+        pending = signal.sigpending()
         previous = signal.getsignal(signal.SIGALRM)
+        current = signal.getitimer(signal.ITIMER_REAL)
     except (OSError, ValueError) as exc:
-        raise GithubReadError("cannot establish hard HTTPS deadline") from exc
+        raise GithubReadError("cannot establish hard HTTPS deadline safely") from exc
+    if signal.SIGALRM in blocked or signal.SIGALRM in pending:
+        raise GithubReadError("SIGALRM blocked or pending; refusing HTTPS deadline")
+    # A signal handler belongs to its caller even with an inactive timer.
+    # Never intercept unrelated SIGALRM deliveries from other threads/processes.
+    if previous is not signal.SIG_DFL:
+        raise GithubReadError("existing SIGALRM handler prevents HTTPS deadline")
     if current != (0.0, 0.0):
         raise GithubReadError("existing process alarm prevents safe HTTPS deadline")
 

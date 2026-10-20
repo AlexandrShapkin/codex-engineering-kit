@@ -303,6 +303,94 @@ class HttpTests(unittest.TestCase):
         self.assertFalse(released.is_set(),
                          "HTTP chunk parser blocked past whole-request deadline")
 
+    def _run_isolated_signal_case(self, snippet):
+        """Run signal-manipulating checks outside the unittest process."""
+        command = [sys.executable, "-c", snippet]
+        proc = subprocess.run(
+            command, stdin=subprocess.DEVNULL, capture_output=True,
+            text=True, timeout=5,
+            cwd=str(Path(__file__).resolve().parent.parent))
+        self.assertEqual(proc.returncode, 0,
+                         "signal subprocess returned " + str(proc.returncode)
+                         + "; stderr: " + proc.stderr)
+
+    def test_blocked_sigalrm_rejected_without_pending_timer(self):
+        self._run_isolated_signal_case("""
+import os, signal
+from unittest import mock
+from engineering_kit.github_public import get_public, GithubReadError
+assert signal.getsignal(signal.SIGALRM) is signal.SIG_DFL
+mask = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
+try:
+    assert signal.SIGALRM not in signal.sigpending()
+    with mock.patch("http.client.HTTPSConnection",
+                    side_effect=AssertionError("network must not start")):
+        try:
+            get_public("owner/repo", "issue", "7")
+        except GithubReadError as e:
+            assert "blocked or pending" in str(e)
+        else:
+            raise AssertionError("blocked SIGALRM accepted")
+    assert signal.SIGALRM not in signal.sigpending()
+    assert signal.getsignal(signal.SIGALRM) is signal.SIG_DFL
+    assert signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0)
+finally:
+    signal.pthread_sigmask(signal.SIG_SETMASK, mask)
+""")
+
+    def test_pending_sigalrm_preserved_without_replacing_handler(self):
+        self._run_isolated_signal_case("""
+import os, signal
+from unittest import mock
+from engineering_kit.github_public import get_public, GithubReadError
+delivered = []
+def owned_handler(*args):
+    delivered.append("delivered")
+signal.signal(signal.SIGALRM, owned_handler)
+mask = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGALRM})
+try:
+    os.kill(os.getpid(), signal.SIGALRM)
+    assert signal.SIGALRM in signal.sigpending()
+    with mock.patch("http.client.HTTPSConnection",
+                    side_effect=AssertionError("network must not start")):
+        try:
+            get_public("owner/repo", "issue", "7")
+        except GithubReadError as e:
+            assert "blocked or pending" in str(e)
+        else:
+            raise AssertionError("pending SIGALRM accepted")
+    assert signal.getsignal(signal.SIGALRM) is owned_handler
+    assert signal.SIGALRM in signal.sigpending()
+    assert signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0)
+finally:
+    signal.pthread_sigmask(signal.SIG_SETMASK, mask)
+assert delivered == ["delivered"]
+""")
+
+    def test_existing_custom_sigalrm_handler_remains_authoritative(self):
+        self._run_isolated_signal_case("""
+import os, signal
+from unittest import mock
+from engineering_kit.github_public import get_public, GithubReadError
+delivered = []
+def owned_handler(*args):
+    delivered.append("delivered")
+signal.signal(signal.SIGALRM, owned_handler)
+assert signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0)
+with mock.patch("http.client.HTTPSConnection",
+                side_effect=AssertionError("network must not start")):
+    try:
+        get_public("owner/repo", "issue", "7")
+    except GithubReadError as e:
+        assert "existing SIGALRM handler" in str(e)
+    else:
+        raise AssertionError("external signal handler taken over")
+assert signal.getsignal(signal.SIGALRM) is owned_handler
+assert signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0)
+os.kill(os.getpid(), signal.SIGALRM)
+assert delivered == ["delivered"]
+""")
+
     def test_hard_deadline_refuses_threaded_use_without_signal_side_effects(self):
         from engineering_kit.github_public import _hard_deadline
         original = signal.getsignal(signal.SIGALRM)
