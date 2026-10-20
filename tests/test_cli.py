@@ -188,7 +188,7 @@ class CliTests(unittest.TestCase):
             with self.assertRaises(SystemExit) as result:
                 main(["--help"])
         self.assertEqual(result.exception.code, 0)
-        self.assertIn("{status,context,doctor,checks,bundle,sync}", output.getvalue())
+        self.assertIn("{status,context,doctor,checks,bundle,distribution,sync}", output.getvalue())
         self.assertNotIn("github-get", output.getvalue())
 
 

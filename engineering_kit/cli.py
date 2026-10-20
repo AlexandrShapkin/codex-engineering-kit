@@ -8,6 +8,7 @@ import shutil
 import sys
 
 from engineering_kit.sync import SyncError, export, plan, write, PROFILES
+from engineering_kit.distribution import generate
 from engineering_kit.contract import ContractError, requirements
 from engineering_kit.git_observe import ObservationError, observe
 
@@ -63,6 +64,15 @@ def main(argv: list[str] | None = None) -> int:
     bundle.add_argument("--revision", required=True)
     bundle.add_argument("--profile", choices=(*PROFILES, "administrative"), required=True)
     bundle.add_argument("--output", type=Path, required=True)
+    distribution = subs.add_parser("distribution", description="Generate private candidate; never publish")
+    distribution.add_argument("--channel", choices=("kit", "admin"), required=True)
+    distribution.add_argument("--source", type=Path, required=True)
+    distribution.add_argument("--revision", required=True)
+    distribution.add_argument("--profile", choices=(*PROFILES, "administrative"), required=True)
+    distribution.add_argument("--output", type=Path, required=True)
+    distribution.add_argument("--review", type=Path, required=True)
+    distribution.add_argument("--review-sha256", required=True)
+    distribution.add_argument("--generator-revision", required=True)
     sync = subs.add_parser("sync")
     sync_subs = sync.add_subparsers(dest="operation", required=True)
     for operation in ("plan", "write"):
@@ -70,18 +80,25 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("--channel", choices=("kit", "admin"), default="kit")
         command.add_argument("--root", type=Path, required=True)
         command.add_argument("--bundle", type=Path, required=True)
+        command.add_argument("--public-bundle-sha256",
+                             help="Full digest of named bytes separately approved by owner")
         if operation == "write":
             command.add_argument("--allow", action="append", default=[])
             command.add_argument("--plan-sha256", required=True)
     args = p.parse_args(argv)
     try:
-        if args.command == "bundle":
+        if args.command == "distribution":
+            result = generate(args.source, args.revision, args.profile, args.output,
+                              args.channel, args.review, args.review_sha256,
+                              args.generator_revision)
+        elif args.command == "bundle":
             result = export(args.source, args.revision, args.profile, args.output, args.channel)
         elif args.command == "sync":
             if args.operation == "plan":
-                result, _ = plan(args.root, args.bundle, args.channel)
+                result, _ = plan(args.root, args.bundle, args.channel, args.public_bundle_sha256)
             else:
-                result = write(args.root, args.bundle, args.allow, args.plan_sha256, args.channel)
+                result = write(args.root, args.bundle, args.allow, args.plan_sha256,
+                               args.channel, args.public_bundle_sha256)
         elif args.command == "status":
             result = observe(args.root)
         elif args.command == "context":
