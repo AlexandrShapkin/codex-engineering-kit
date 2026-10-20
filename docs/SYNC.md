@@ -25,7 +25,10 @@ Review the bundle contents, `changes` array and `plan_sha256`. Plan performs
 no writes and does not create missing directories. For write, provide the
 returned digest and one `--allow PATH` for **each** changed path, including
 `.engineering-kit/lock.json`. No glob, directory permission or implicit approval
-is accepted. For example, append all individually reviewed paths to:
+is accepted. The digest binds the plan to the absolute normalized consumer path
+and its filesystem device/inode identity; moving or replacing the directory
+requires a new plan, and tokens cannot be transferred between consumers.
+For example, append all individually reviewed paths to:
 
 ```sh
 python3 -B scripts/ek.py sync write --root /path/to/consumer \
@@ -58,7 +61,7 @@ there is no automatic downgrade prohibition or remote version resolution.
 A second plan for an already installed bundle is empty.
 
 Any missing/edited managed file, untracked collision, malformed manifest,
-duplicate JSON key, checksum mismatch, unsafe path or symlink in the root/path
+duplicate JSON key, excessive JSON nesting, checksum mismatch, unsafe path or symlink in the root/path
 aborts validation. Never delete the lock to bypass a conflict. Preserve edits
 and reconcile deliberately outside this command, then rerun plan. Unmanaged
 files, including other files in `.engineering-kit/`, are preserved; directories

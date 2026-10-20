@@ -1,5 +1,7 @@
 """Offline bundle/sync safety and lifecycle regression tests."""
 import copy
+from contextlib import redirect_stdout, redirect_stderr
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -8,7 +10,7 @@ import unittest
 from unittest import mock
 
 from engineering_kit.sync import (LOCK, PROFILES, SOURCES, SyncError, digest,
-                                  encoded, export, plan, write)
+                                  encoded, export, load, plan, write)
 from engineering_kit.cli import main
 
 
@@ -66,6 +68,67 @@ class SyncTests(unittest.TestCase):
         self.save({self.name: 'changed'})
         with self.assertRaises(SyncError):
             write(self.root, self.bundle, [self.name, LOCK], result['plan_sha256'])
+
+    def test_plan_token_is_bound_to_consumer_directory(self):
+        other = self.base / 'other'
+        other.mkdir()
+        for installed in (False, True):
+            if installed:
+                self.apply()
+                for path in self.root.rglob('*'):
+                    target = other / path.relative_to(self.root)
+                    if path.is_dir():
+                        target.mkdir(exist_ok=True)
+                    else:
+                        target.write_bytes(path.read_bytes())
+                self.save({self.name: 'updated'})
+            a, _ = plan(self.root, self.bundle)
+            b, _ = plan(other, self.bundle)
+            self.assertEqual(a['changes'], b['changes'])
+            self.assertNotEqual(a['plan_sha256'], b['plan_sha256'])
+            before = {str(p): p.read_bytes() for p in other.rglob('*') if p.is_file()}
+            with self.assertRaises(SyncError):
+                write(other, self.bundle, [c['path'] for c in a['changes']],
+                      a['plan_sha256'])
+            self.assertEqual(before, {str(p): p.read_bytes()
+                                      for p in other.rglob('*') if p.is_file()})
+            self.assertEqual(plan(self.root / '.', self.bundle)[0]['plan_sha256'],
+                             a['plan_sha256'])
+
+    def test_replaced_consumer_directory_invalidates_plan(self):
+        result, _ = plan(self.root, self.bundle)
+        self.root.rename(self.base / 'original')
+        self.root.mkdir()
+        with self.assertRaises(SyncError):
+            write(self.root, self.bundle, [c['path'] for c in result['changes']],
+                  result['plan_sha256'])
+        self.assertEqual(list(self.root.iterdir()), [])
+
+    def test_deep_json_is_controlled_failure_for_bundle_and_lock(self):
+        depth = 10000
+        deep = b'[' * depth + b'0' + b']' * depth
+        for target in (self.bundle, self.root / LOCK):
+            self.save({self.name: 'one\n'})
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(deep)
+            before = {str(p): p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
+            with self.assertRaises(SyncError):
+                plan(self.root, self.bundle)
+            for operation in ('plan', 'write'):
+                args = ['sync', operation, '--root', str(self.root),
+                        '--bundle', str(self.bundle)]
+                if operation == 'write':
+                    args += ['--plan-sha256', 'bad']
+                with redirect_stdout(io.StringIO()) as output, \
+                        redirect_stderr(io.StringIO()) as errors:
+                    self.assertEqual(main(args), 1)
+                result = json.loads(output.getvalue())
+                self.assertFalse(result['ok'])
+                self.assertIn(result['error'], ('invalid JSON', 'invalid bundle',
+                                                'invalid manifest'))
+                self.assertEqual(errors.getvalue(), '')
+            self.assertEqual(before, {str(p): p.read_bytes()
+                                      for p in self.root.rglob('*') if p.is_file()})
 
     def test_local_edits_missing_collision_and_lock_tampering(self):
         self.apply()
@@ -190,6 +253,11 @@ class SyncTests(unittest.TestCase):
         self.bundle.write_bytes(b' ' * (1024 * 1024 + 1))
         with self.assertRaises(SyncError):
             plan(self.root, self.bundle)
+
+    def test_json_recursion_error_becomes_sync_error(self):
+        with mock.patch('engineering_kit.sync.json.loads', side_effect=RecursionError):
+            with self.assertRaisesRegex(SyncError, '^invalid JSON$'):
+                load(b'[]')
 
     def test_sync_never_spawns_process_or_network(self):
         with mock.patch('subprocess.Popen', side_effect=AssertionError('process')), \

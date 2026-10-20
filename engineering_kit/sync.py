@@ -86,7 +86,7 @@ def load(data):
         return result
     try:
         return json.loads(data, object_pairs_hook=unique)
-    except (ValueError, UnicodeError) as exc:
+    except (ValueError, UnicodeError, RecursionError) as exc:
         raise SyncError('invalid JSON') from exc
 
 
@@ -152,7 +152,7 @@ def export(source, revision, profile, output):
 
 
 def plan(root, bundle):
-    root = Path(root)
+    root = Path(os.path.abspath(root))
     if not root.is_dir():
         raise SyncError('target root must exist')
     manifest, contents = bundle_read(bundle)
@@ -176,7 +176,10 @@ def plan(root, bundle):
     contents[LOCK] = encoded(manifest)
     if contents[LOCK] != lock_data:
         changes.append({'path': LOCK, 'action': 'create' if lock_data is None else 'update'})
-    token = digest(encoded({'manifest': manifest, 'changes': changes,
+    identity = root.stat()
+    token = digest(encoded({'consumer': {'path': str(root), 'device': identity.st_dev,
+                                         'inode': identity.st_ino},
+                            'manifest': manifest, 'changes': changes,
                             'before': {n: digest(v) if v is not None else None
                                        for n, v in snapshots.items()}}))
     return {'changes': changes, 'plan_sha256': token, 'upstream': manifest['upstream'],
