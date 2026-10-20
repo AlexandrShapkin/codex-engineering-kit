@@ -32,4 +32,8 @@ python3 -B scripts/check_contract.py --root /path/to/consumer --profile rustcraf
 
 A contract check neither runs the consumer native checks nor verifies product functionality. All source consumers retain their own CI and security gates.
 
-**Next independent PRs:** bounded offline CLI/Git/GitHub GET, then pinned bundles/updater/templates. No general orchestrator, MCP server, credentials, Codex global config, RelayForge grants, deployment or automatic external mutation is included.
+The optional CLI provides local `status`, `context`, `doctor` and `checks`
+observations. See [CLI usage and limits](docs/CLI.md). GitHub GET is deferred
+from v0.1; the CLI has no network command or GitHub-tool fallback.
+
+GitHub retrieval, pinned bundles, updaters and consumer templates remain outside this v0.1 slice. No general orchestrator, MCP server, credentials, Codex global config, RelayForge grants, deployment or automatic external mutation is included.
