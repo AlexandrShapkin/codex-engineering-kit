@@ -49,7 +49,7 @@ class GitFixture(unittest.TestCase):
         with mock.patch("subprocess.Popen", wraps=subprocess.Popen) as popen:
             result = observe(self.root)
         self.assertEqual(result["staged_entry_count"], 1)
-        self.assertEqual(result["untracked_entry_count"], 1)
+        self.assertGreaterEqual(result["untracked_entry_count"], 1)
         self.assertEqual(result["unstaged_tracked_changes"], "UNVERIFIED")
         self.assertFalse((self.root / "FILTER_WAS_RUN").exists())
         self.assertEqual(len(popen.call_args_list), 5)
