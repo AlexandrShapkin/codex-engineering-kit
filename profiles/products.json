@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "required": {
+    "codex-smart": [
+      "just context [STAGE]",
+      "docs/workflow.md",
+      "just docs-check",
+      "just check",
+      "just security",
+      "PR #125",
+      "PR #164"
+    ],
+    "relayforge": [
+      "docs/development-without-rdc.md",
+      "docs/security.md",
+      "Rustfmt",
+      "Clippy",
+      "cargo test --workspace --locked",
+      "recovery tests",
+      "isolated release build",
+      "offline MCP smoke",
+      "CARGO_TARGET_DIR",
+      "P0 runtime/build boundary"
+    ],
+    "assistant-hub": [
+      "docs/workflow.md",
+      "3.11–3.13",
+      "PYTHONPATH=src python -m unittest discover -s tests -v",
+      "python -m compileall -q src tests scripts",
+      "PYTHONPATH=src python -m assistant_hub doctor",
+      "python scripts/check_public_tree.py --include-untracked",
+      "node --test web/tests/*.test.mjs",
+      "git diff --check"
+    ],
+    "rustcraft": [
+      "just codex-context [STAGE]",
+      "docs/INDEX.md",
+      "just ci",
+      "Ubuntu and Windows",
+      "reference-study",
+      "engine/game policy"
+    ],
+    "minimal": [
+      "project-specific rules",
+      "native checks"
+    ]
+  }
+}

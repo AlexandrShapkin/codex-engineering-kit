@@ -1,0 +1,26 @@
+name: Engineering Kit offline checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Contract and skills
+        run: python -B scripts/check_contract.py --self-check
+      - name: Offline tests
+        run: python -B -m unittest discover -s tests -v
+      - name: Syntax
+        run: python -B -m compileall -q engineering_kit scripts tests
