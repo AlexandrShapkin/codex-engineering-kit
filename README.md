@@ -2,7 +2,7 @@
 
 Shared agent instructions, offline validation and future reusable development tools for Codex projects.
 
-**Status:** initial v0.1 **Draft source proposal**. Private repository, no license selected. No runtime, merge, device, secret or installation authority.
+**Status:** accepted source; proposed `v0.1.0` is in private qualification. Private repository, no license selected. No runtime, merge, device, secret or installation authority.
 
 The v0.1 source imports the exact normative workflow and shared agent block from the four unmerged agent-unification proposals. This snapshot has not been accepted or integrated into their main branches.
 
@@ -42,3 +42,7 @@ Administrative workflow ownership and the opt-in format-2 template channel are
 specified in [SYNC](docs/SYNC.md#administrative-channel-format-2-proposed-compatibility-extension).
 Existing v0.1 contract files remain unchanged legacy snapshots for compatibility;
 new administrative policy is canonical in `AlexandrShapkin/project-template`.
+
+Independent tags/Releases, compatibility and authority gates are specified in
+[release qualification](docs/RELEASING.md). The [public-readiness audit](docs/PUBLIC_READINESS.md)
+remains blocked by license/rights and separate owner decisions; no version is released.
