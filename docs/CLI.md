@@ -1,6 +1,6 @@
 # CLI observation (v0.1 Draft)
 
-The CLI is explicitly **read-only**: no install, GitHub writes, task runner, worktree creation, destructive cleanup or consumer-native execution.
+Source-only, explicitly bounded developer queries. No dependency installation, privileged MCP, GitHub writes, product-native command execution or destructive cleanup.
 
 \`\`\`sh
 python3 -B scripts/ek.py doctor
@@ -8,15 +8,19 @@ python3 -B scripts/ek.py status --root /path/to/repository
 python3 -B scripts/ek.py context --root /path/to/repository
 python3 -B scripts/ek.py checks --profile rustcraft
 
-# The ONLY command with network: explicit anonymous public GitHub GET
+# The ONLY network command, explicit anonymous public GitHub GET:
 python3 -B scripts/ek.py github-get issue OWNER/REPO 123
 python3 -B scripts/ek.py github-get pr OWNER/REPO 123
 python3 -B scripts/ek.py github-get run OWNER/REPO 123456
 python3 -B scripts/ek.py github-get commit OWNER/REPO FULL_SHA
 \`\`\`
 
-Outputs JSON. \`status\` invokes only fixed local Git introspection commands, with Git optional locks disabled, no external Git configuration, no fsmonitor and no hooks. It uses only index-vs-HEAD and untracked-path metadata, returning counts without copying filenames into logs. **Unstaged tracked changes remain UNVERIFIED**: content-comparing Git operations such as `git status` and `git diff-files` can execute untrusted repository clean filters. \`context\` lists known source entrypoint names; \`doctor\` checks binary availability without invoking or installing them. \`checks\` reports product-native requirement **markers only**; it never executes them.
+JSON output. \`status\` uses fixed local Git metadata commands with \`GIT_NO_LAZY_FETCH=1\`, \`GIT_ALLOW_PROTOCOL=""\`, no global/system configuration, no hooks/fsmonitor and optional locks disabled. It captures stdout in a **128 KiB bounded stream**, drops stderr without buffering, enforces a 10-second deadline and terminates timed-out/over-limit processes. POSIX is required; unsupported platforms fail closed. No Git fetch/transport or user-repository programs are authorized.
 
-\`github-get\` is the only command that makes HTTPS requests. It only accepts syntactically checked repo IDs and exact bounded resource identifiers, fixes host to \`api.github.com\`, limits response and timeout, refuses redirects/proxy-derived credentials and reads **anonymous public** data only. Private repositories are not supported in this version. It never reads local GitHub tokens or authentication files, and it does not send authorization headers. Results are treated as untrusted data.
+Only staged and untracked file counts are reported. **Unstaged tracked changes remain UNVERIFIED** because content-comparing Git operations can execute repository-defined clean filters. Partial clones with missing objects return a controlled failure, not a fetch.
 
-These checks do not replace CI/security/independent review, and do not authorize merge, runtime activation, deploy or privileged MCP tools.
+\`context\` lists known source files, \`doctor\` reports binary availability without launching or installing tools, and \`checks\` lists product-native verification markers without executing commands.
+
+\`github-get\` only supports anonymous public GitHub API requests. The host is fixed to \`api.github.com\` over TLS with \`http.client\` (no environment proxy, redirect following, automatic credentials or token files). Every GET has **one shared monotonic 10-second deadline** covering request, response headers and bounded body reads; the response must be JSON, at most 64 KiB. It rejects incomplete HTTP and excessively nested JSON with controlled errors. Time spent in a platform DNS resolver may not be forcibly preemptible; overdue responses must be rejected, never accepted as PASS. No attempt is made to access private repositories.
+
+Product-native tests and exact-head CI, security review, permissions and runtime evidence are separate requirements.
