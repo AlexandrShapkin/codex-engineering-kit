@@ -2,6 +2,8 @@
 import http.client
 import json
 import os
+import signal
+import threading
 from pathlib import Path
 import shutil
 import socket
@@ -13,7 +15,7 @@ import unittest
 from unittest import mock
 
 from engineering_kit.cli import main
-from engineering_kit.git_observe import ObservationError, _env, observe
+from engineering_kit.git_observe import ObservationError, _env, observe, _git
 from engineering_kit.github_public import GithubReadError, get_public
 
 
@@ -91,6 +93,48 @@ class GitFixture(unittest.TestCase):
             (self.root / ("test_" + str(i) + "_" + ("a" * 80))).write_text("")
         with self.assertRaisesRegex(ObservationError, "bounded limit"):
             observe(self.root)
+
+    def test_timeout_kills_git_process_group_and_child(self):
+        # A fake fixed Git executable creates a descendant that holds stdout.
+        # The descendant must not survive when the bounded call times out.
+        parent = self.root / "fakegit.py"
+        spawned = self.root / "spawned.pid"
+        marker = self.root / "CHILD_SURVIVED"
+        child_code = "import time,pathlib;time.sleep(0.65);pathlib.Path(" + repr(str(marker)) + ").write_text('unsafe')"
+        parent.write_text(
+            "#!" + sys.executable + "\n"
+            "import subprocess,sys,time,pathlib\n"
+            "p=subprocess.Popen([sys.executable,'-c'," + repr(child_code) + "],stdout=sys.stdout)\n"
+            "pathlib.Path(" + repr(str(spawned)) + ").write_text(str(p.pid))\n"
+            "time.sleep(60)\n")
+        parent.chmod(0o700)
+        try:
+            with mock.patch("engineering_kit.git_observe.SECONDS", 0.16):
+                with self.assertRaisesRegex(ObservationError, "timed out"):
+                    _git(str(parent), self.root, ["rev-parse", "--show-toplevel"])
+            self.assertTrue(spawned.is_file(), "fixture did not spawn child")
+            child_pid = int(spawned.read_text())
+            # Linux may keep a dead process as an orphan zombie briefly.
+            # Alive running/sleeping descendants are unacceptable.
+            def is_live(pid):
+                path = Path("/proc") / str(pid) / "stat"
+                if path.is_file():
+                    return path.read_text().split(") ", 1)[1][0] != "Z"
+                try:
+                    os.kill(pid, 0)
+                except ProcessLookupError:
+                    return False
+                return True
+            time.sleep(0.04)
+            self.assertFalse(is_live(child_pid), "Git descendant is still running")
+            time.sleep(0.7)
+            self.assertFalse(marker.exists(), "Git descendant performed post-timeout work")
+        finally:
+            if spawned.exists():
+                try:
+                    os.kill(int(spawned.read_text()), signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
 
     def test_git_error_never_logs_stderr(self):
         marker = self.root / "fake-git.sh"
@@ -207,6 +251,85 @@ class HttpTests(unittest.TestCase):
         with mock.patch("http.client.HTTPSConnection", return_value=conn):
             with self.assertRaisesRegex(GithubReadError, "nested"):
                 get_public("owner/repo", "issue", "7")
+
+    def _fragmented_response(self, initial, delayed):
+        # Real HTTPResponse parsing atop a local socketpair. No Internet.
+        left, right = socket.socketpair()
+        released = threading.Event()
+        def writer():
+            try:
+                right.sendall(initial)
+                time.sleep(0.19)
+                released.set()
+                right.sendall(delayed)
+            except OSError:
+                released.set()
+            finally:
+                right.close()
+        thread = threading.Thread(target=writer, daemon=True)
+        thread.start()
+        response = http.client.HTTPResponse(left)
+        connection = mock.Mock(sock=left)
+        def headers():
+            response.begin()
+            return response
+        connection.getresponse.side_effect = headers
+        self.addCleanup(thread.join, 0.5)
+        self.addCleanup(response.close)
+        self.addCleanup(left.close)
+        return connection, released
+
+    def test_deadline_interrupts_real_slow_headers(self):
+        connection, released = self._fragmented_response(
+            b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n",
+            b"Content-Length: 12\r\n\r\n{\"number\":7}")
+        with mock.patch("engineering_kit.github_public.MAX_SECONDS", 0.045), \
+             mock.patch("http.client.HTTPSConnection", return_value=connection):
+            with self.assertRaisesRegex(GithubReadError, "deadline"):
+                get_public("owner/repo", "issue", "7")
+        self.assertFalse(released.is_set(),
+                         "HTTP header parser blocked past whole-request deadline")
+
+    def test_deadline_interrupts_real_slow_chunk_size(self):
+        connection, released = self._fragmented_response(
+            b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"
+            b"Transfer-Encoding: chunked\r\n\r\n1",
+            b"\r\n0\r\n0\r\n\r\n")
+        with mock.patch("engineering_kit.github_public.MAX_SECONDS", 0.045), \
+             mock.patch("http.client.HTTPSConnection", return_value=connection):
+            with self.assertRaisesRegex(GithubReadError, "deadline"):
+                get_public("owner/repo", "issue", "7")
+        self.assertFalse(released.is_set(),
+                         "HTTP chunk parser blocked past whole-request deadline")
+
+    def test_hard_deadline_refuses_threaded_use_without_signal_side_effects(self):
+        from engineering_kit.github_public import _hard_deadline
+        original = signal.getsignal(signal.SIGALRM)
+        problems = []
+        def worker():
+            try:
+                with _hard_deadline(0.05):
+                    pass
+            except GithubReadError as exc:
+                problems.append(str(exc))
+        th = threading.Thread(target=worker)
+        th.start()
+        th.join()
+        self.assertTrue(problems)
+        self.assertIs(original, signal.getsignal(signal.SIGALRM))
+
+    def test_hard_deadline_preserves_existing_process_alarm(self):
+        from engineering_kit.github_public import _hard_deadline
+        # Respect an existing application's signal timer; never replace it.
+        old = signal.getitimer(signal.ITIMER_REAL)
+        signal.setitimer(signal.ITIMER_REAL, 1.0)
+        try:
+            with self.assertRaisesRegex(GithubReadError, "existing process alarm"):
+                with _hard_deadline(0.04):
+                    pass
+            self.assertGreater(signal.getitimer(signal.ITIMER_REAL)[0], 0)
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, *old)
 
     def test_unsupported_response_socket_refused(self):
         conn, resp = self.fake_connection()
