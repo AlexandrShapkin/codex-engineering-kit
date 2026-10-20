@@ -190,6 +190,11 @@ def check(root: Path, name: str) -> None:
 
 
 def self_check() -> None:
+    from engineering_kit.governance import check as check_governance
+    try:
+        check_governance(ROOT)
+    except (ValueError, OSError) as exc:
+        raise ContractError(str(exc)) from exc
     canonical()
     requirements()
     for name in ("ek-context", "ek-verify", "ek-pr-closeout"):

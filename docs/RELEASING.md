@@ -4,8 +4,8 @@ Issue #13; coordinates Kit #11/#8 and [Project Template #6](https://github.com/A
 This file qualifies only the two proposed v0.1.0 releases and documents Kit's
 technical checker. Template #6 is the sole canonical owner of the universal
 agent/workflow rule for SemVer, narrative release notes and applicable release
-artifacts. That managed instruction change and consumer rollout are not
-implemented here. This is private preparation, not permission to tag, publish,
+artifacts. The managed instruction is adopted through Kit #15; consumer rollout remains
+separate under #8. This is private preparation, not permission to tag, publish,
 change visibility or merge.
 
 ## Version ownership and compatibility
