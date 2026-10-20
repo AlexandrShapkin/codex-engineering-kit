@@ -135,3 +135,15 @@ native CI, independent review and explicit owner merge. Rollback reuses a retain
 old bundle and the same plan/write permissions. For partial I/O failure restore
 files and lock from the pre-update verified snapshot before replanning. Neither
 channel implicitly upgrades the other; retain both full SHAs and both bundles.
+
+
+## Source licensing and protocol classification
+
+[MIT](../LICENSE) covers owner-controlled source; see [publication status](PUBLICATION.md).
+Source visibility and license clearance do not change format-1/2 private defaults,
+format-3 approval digests, collision rules or exact-path/plan authorization.
+A source checkout includes LICENSE. Copies/substantial portions placed in another
+repository must retain the copyright and permission notice in a reviewed
+project-owned license/notice file; that file is outside both six-path sync sets.
+Never add it implicitly to a bundle, alter an old lock, or treat a downloaded
+checksum as publisher approval. Existing installed pins remain independently reviewed.

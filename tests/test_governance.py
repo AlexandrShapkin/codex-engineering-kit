@@ -73,7 +73,7 @@ class GovernanceTests(unittest.TestCase):
                      'exact-head GitHub CI', 'Do not execute consumer commands',
                      'Never install dependencies, fetch secrets, change global Codex config',
                      'use RDC, run a production build, deploy, merge',
-                     'owner has not selected a LICENSE'):
+                     'MIT LICENSE applies to owner-controlled source'):
             with self.subTest(gate=gate):
                 path.write_text(original.replace(gate, 'removed'))
                 with self.assertRaisesRegex(ValueError, 'Kit gate'):

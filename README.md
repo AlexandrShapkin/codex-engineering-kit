@@ -2,7 +2,7 @@
 
 Shared agent instructions, offline validation and future reusable development tools for Codex projects.
 
-**Status:** accepted source; proposed `v0.1.0` is in private qualification. Private repository, no license selected. No runtime, merge, device, secret or installation authority.
+**Status:** source-only toolkit under the [MIT License](LICENSE). Public-source publication is being prepared under owner authorization; actual visibility is recorded in [publication readiness](docs/PUBLICATION.md). Proposed `v0.1.0` release qualification remains separate. No runtime, merge, device, secret or installation authority.
 
 The v0.1 source imports the exact normative workflow and shared agent block from the four unmerged agent-unification proposals. This snapshot has not been accepted or integrated into their main branches.
 
@@ -45,7 +45,7 @@ new administrative policy is canonical in `AlexandrShapkin/project-template`.
 
 Independent tags/Releases, compatibility and authority gates are specified in
 [release qualification](docs/RELEASING.md). The [public-readiness audit](docs/PUBLIC_READINESS.md)
-remains blocked by license/rights and separate owner decisions; no version is released.
+is a historical snapshot; [current publication readiness](docs/PUBLICATION.md) records the MIT decision and remaining review/merge gate. No version is released.
 
 Kit follows the Template-owned [administrative interface](.github/DEVELOPMENT_INTERFACE.md).
 Read [AGENTS.local.md](AGENTS.local.md) for stronger Kit gates and
