@@ -1,13 +1,14 @@
-"""Explicit anonymous public GitHub GET. Fixed endpoints, no redirects or tokens."""
+"""Explicit anonymous HTTPS GET for public GitHub metadata. Fixed host only."""
 from __future__ import annotations
 
+import http.client
 import json
 import re
-import urllib.error
-import urllib.request
+import time
 
 MAX_BYTES = 64 * 1024
 MAX_SECONDS = 10
+HOST = "api.github.com"
 REPO_RE = re.compile(r"[A-Za-z0-9_.-]{1,100}/[A-Za-z0-9_.-]{1,100}\Z")
 SHA_RE = re.compile(r"[0-9a-fA-F]{40,64}\Z")
 
@@ -16,9 +17,71 @@ class GithubReadError(ValueError):
     pass
 
 
-class _NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        raise GithubReadError("GitHub redirect refused")
+def _remaining(deadline: float) -> float:
+    seconds = deadline - time.monotonic()
+    if seconds <= 0:
+        raise GithubReadError("GitHub request exceeded overall deadline")
+    return seconds
+
+
+def _read_json(path: str) -> dict[str, object]:
+    """Connection, headers and each read share one monotonic deadline.
+
+    http.client uses a fixed TLS host, no env proxies, redirects, cookies or
+    automatic credentials. Unsupported response transports fail closed.
+    """
+    deadline = time.monotonic() + MAX_SECONDS
+    conn = None
+    try:
+        conn = http.client.HTTPSConnection(HOST, timeout=_remaining(deadline))
+        conn.request("GET", path, headers={
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "codex-engineering-kit/0.1",
+        })
+        _remaining(deadline)
+        response = conn.getresponse()
+        _remaining(deadline)
+        if response.status != 200:
+            if 300 <= response.status < 400:
+                raise GithubReadError("GitHub redirect refused")
+            raise GithubReadError("GitHub request unsuccessful")
+        if "json" not in response.getheader("Content-Type", "").lower():
+            raise GithubReadError("non-JSON GitHub response")
+        content_length = response.getheader("Content-Length")
+        if content_length is not None and content_length.isdecimal() and int(content_length) > MAX_BYTES:
+            raise GithubReadError("GitHub response too large")
+        body = bytearray()
+        # HTTPResponse may own the socket after will_close; refreshing its
+        # timeout before each read stops slow-drip responses at the deadline.
+        socket = conn.sock
+        if socket is None:
+            stream = response.fp
+            socket = getattr(getattr(stream, "raw", None), "_sock", None)
+        if socket is None or not hasattr(socket, "settimeout"):
+            raise GithubReadError("cannot enforce socket deadline safely")
+        while True:
+            socket.settimeout(_remaining(deadline))
+            chunk = response.read1(min(8192, MAX_BYTES + 1 - len(body)))
+            _remaining(deadline)
+            if not chunk:
+                break
+            body.extend(chunk)
+            if len(body) > MAX_BYTES:
+                raise GithubReadError("GitHub response too large")
+        try:
+            item = json.loads(body)
+        except (ValueError, UnicodeError, RecursionError) as exc:
+            raise GithubReadError("invalid or excessively nested GitHub JSON") from exc
+        if not isinstance(item, dict):
+            raise GithubReadError("unexpected GitHub response shape")
+        return item
+    except GithubReadError:
+        raise
+    except (http.client.HTTPException, OSError, ValueError, RecursionError) as exc:
+        raise GithubReadError("public GitHub GET failed or response malformed") from exc
+    finally:
+        if conn is not None:
+            conn.close()
 
 
 def get_public(repo: str, resource: str, identifier: str) -> dict[str, object]:
@@ -35,34 +98,7 @@ def get_public(repo: str, resource: str, identifier: str) -> dict[str, object]:
             raise GithubReadError("expected bounded positive numeric identifier")
         fragment = {"issue": "issues/", "pr": "pulls/",
                     "run": "actions/runs/"}[resource] + identifier
-    url = "https://api.github.com/repos/" + repo + "/" + fragment
-    request = urllib.request.Request(
-        url, headers={"Accept": "application/vnd.github+json",
-                      "User-Agent": "codex-engineering-kit/0.1"},
-        method="GET")
-    # No env proxies (may contain credentials), automatic auth, or redirect.
-    opener = urllib.request.build_opener(
-        urllib.request.ProxyHandler({}), _NoRedirect())
-    try:
-        with opener.open(request, timeout=MAX_SECONDS) as response:
-            if response.status != 200:
-                raise GithubReadError("GitHub request unsuccessful")
-            if "json" not in response.headers.get("Content-Type", "").lower():
-                raise GithubReadError("non-JSON GitHub response")
-            data = response.read(MAX_BYTES + 1)
-            if len(data) > MAX_BYTES:
-                raise GithubReadError("GitHub response too large")
-    except GithubReadError:
-        raise
-    except (OSError, urllib.error.URLError, ValueError) as exc:
-        raise GithubReadError(
-            "public GitHub GET failed (private resources and redirects unsupported)") from exc
-    try:
-        item = json.loads(data)
-    except (ValueError, UnicodeError) as exc:
-        raise GithubReadError("invalid GitHub JSON response") from exc
-    if not isinstance(item, dict):
-        raise GithubReadError("unexpected GitHub response shape")
+    item = _read_json("/repos/" + repo + "/" + fragment)
     public_link = "https://github.com/" + repo
     if resource in ("issue", "pr"):
         expected = int(identifier)
