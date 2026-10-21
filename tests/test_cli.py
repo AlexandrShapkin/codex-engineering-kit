@@ -97,7 +97,16 @@ class GitFixture(unittest.TestCase):
         parent = self.root / "fakegit.py"
         spawned = self.root / "spawned.pid"
         marker = self.root / "CHILD_SURVIVED"
-        child_code = "import time,pathlib;time.sleep(0.65);pathlib.Path(" + repr(str(marker)) + ").write_text('unsafe')"
+        ready = self.root / "child.ready"
+        release = self.root / "child.release"
+        child_code = (
+            "import time,pathlib\n"
+            "pathlib.Path(" + repr(str(ready)) + ").touch()\n"
+            "deadline=time.monotonic()+10\n"
+            "while not pathlib.Path(" + repr(str(release)) + ").exists():\n"
+            " if time.monotonic()>deadline: raise SystemExit(1)\n"
+            " time.sleep(0.01)\n"
+            "pathlib.Path(" + repr(str(marker)) + ").write_text('unsafe')\n")
         parent.write_text(
             "#!" + sys.executable + "\n"
             "import subprocess,sys,time,pathlib\n"
@@ -105,8 +114,26 @@ class GitFixture(unittest.TestCase):
             "pathlib.Path(" + repr(str(spawned)) + ").write_text(str(p.pid))\n"
             "time.sleep(60)\n")
         parent.chmod(0o700)
+        real_popen = subprocess.Popen
+
+        def start_ready(*args, **kwargs):
+            proc = real_popen(*args, **kwargs)
+            # The production deadline starts after Popen returns. Wait for the
+            # fixture only, so scheduler/Python startup does not consume the
+            # 160 ms being used to test process-group termination.
+            deadline = time.monotonic() + 10
+            while not (ready.is_file() and spawned.is_file()):
+                if proc.poll() is not None or time.monotonic() >= deadline:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                    proc.wait(timeout=2)
+                    proc.stdout.close()
+                    self.fail("fixture did not start its descendant")
+                time.sleep(0.01)
+            return proc
+
         try:
-            with mock.patch("engineering_kit.git_observe.SECONDS", 0.16):
+            with mock.patch("engineering_kit.git_observe.subprocess.Popen", side_effect=start_ready), \
+                 mock.patch("engineering_kit.git_observe.SECONDS", 0.16):
                 with self.assertRaisesRegex(ObservationError, "timed out"):
                     _git(str(parent), self.root, ["rev-parse", "--show-toplevel"])
             self.assertTrue(spawned.is_file(), "fixture did not spawn child")
@@ -124,6 +151,7 @@ class GitFixture(unittest.TestCase):
                 return True
             time.sleep(0.04)
             self.assertFalse(is_live(child_pid), "Git descendant is still running")
+            release.touch()
             time.sleep(0.7)
             self.assertFalse(marker.exists(), "Git descendant performed post-timeout work")
         finally:

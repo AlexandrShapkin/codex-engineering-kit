@@ -1,235 +1,110 @@
-# Independent SemVer and first-release qualification
+# Kit v0.1.0 candidate qualification
 
-Issue #13; coordinates Kit #11/#8 and [Project Template #6](https://github.com/AlexandrShapkin/project-template/issues/6).
-This file qualifies only the two proposed v0.1.0 releases and documents Kit's
-technical checker. Template #6 is the sole canonical owner of the universal
-agent/workflow rule for SemVer, narrative release notes and applicable release
-artifacts. The managed instruction is adopted through Kit #15; consumer rollout remains
-separate under #8. The owner has separately authorized MIT and source visibility
-after the checks in [PUBLICATION.md](PUBLICATION.md). This release preparation
-does not authorize tags, Releases, bundle uploads or unreviewed merges.
+Owning Issue: [#13](https://github.com/AlexandrShapkin/codex-engineering-kit/issues/13).
+Template [#6](https://github.com/AlexandrShapkin/project-template/issues/6) owns
+shared release policy in `.github/DEVELOPMENT_INTERFACE.md`. Kit owns technical
+export, integrity and updater mechanisms. Kit #8 is CLOSED; its migrations are
+complete. No new migration, runtime, tag or publication is authorized here.
 
-## Version ownership and compatibility
+## Current source and compatibility
 
-Use immutable **annotated** Git tags `vMAJOR.MINOR.PATCH` and GitHub Releases in
-**each canonical upstream**. Propose `v0.1.0` independently in both; no VERSION
-file, lock-step version, orchestrator or third editable source. Full source SHA,
-per-file SHA-256, review SHA and approved format-3 artifact digest remain the
-machine identities. Never resolve a consumer update from a floating tag.
+Accepted source baseline: `8f2008dfcfa27ca1e4b4b754baecec29a22e86a0`.
+Template's independent accepted baseline is
+`8f964eda3f530d41f78e776a2087d0b33e570358`. Both canonical upstreams are PUBLIC/MIT;
+see their accepted publication/rights records. Historical private-source and
+unselected-license statements in old audits describe earlier checkpoints.
+They are not new owner decisions to repeat. Fresh source/history and GitHub
+surface deltas still require review before release.
 
-| Version | Owned compatibility surface |
-| --- | --- |
-| Kit release | Documented CLI commands/arguments/results, export/sync safety and adapters, supported bundle/lock protocols, technical skills/profiles |
-| Template release | Six managed administrative paths, lifecycle/extension contract, documented scaffolding/migration and supported lock/tooling metadata |
-| Protocol integer 1/2/3 | Existing wire schema only; unrelated to either repository's SemVer |
+The candidate containing this document is identified by the full PR head in
+its handoff. A future accepted merge SHA needs its own exact-head checks; do not
+predict it or treat a branch name as a pin. No `v0.1.0` tag is created by preparing
+this candidate. Each repository versions independently with immutable annotated
+`vMAJOR.MINOR.PATCH` tags; never move, reuse or replace a release tag.
 
-Kit legacy contract snapshots are compatibility/provenance, not a competing
-administrative authority. Template retains the active lifecycle. A Template tag
-does not upgrade its separately recorded installed Kit or administrative source
-pins. A Kit tool release need not re-export or modify any managed content.
+Kit's public interface is its CLI, offline export/sync/source-update safety,
+bundle/lock protocols and technical references. Compatible first-series patches
+support `>=0.1.0,<0.2.0`; a breaking `0.x` change needs a MINOR increment and
+migration guidance. Format integers 1/2/3 are independent wire protocols.
+Full source SHAs and file/artifact SHA-256 remain authoritative. No version
+implicitly advances consumer pins, installs skills or changes native gates.
 
-PATCH fixes preserve compatibility and safety; MINOR adds backwards-compatible
-features; after API stabilization, MAJOR changes require an explicit migration.
-For provisional `0.x`, there is no stable API promise across minor versions:
-PATCH must still be compatible; a deliberately incompatible pre-stable change
-requires a new minor, explicit BREAKING notes, migration/rollback and independent
-review. Compatible additions also use MINOR. Never ship a breaking PATCH or
-infer compatibility from a version alone. Reaching `1.0.0` requires an explicit
-stable API decision. None of this permits relaxing existing format-1/2 private
-validation or format-3 checks. GitHub `prerelease=false` for `v0.1.0` means a normal
-numbered release, not a stable API promise. RC/build-metadata tags are outside the
-minimal checker; design them separately if needed. See [SemVer](https://semver.org/spec/v2.0.0.html).
+## Bounded first-release matrix
 
-## Minimal two-upstream distribution
+| Asset | Target / use | Qualification |
+| --- | --- | --- |
+| `kit-v0.1.0-minimal.public-safe.json` | Python 3.11+ / POSIX; usable six-file technical reference bundle | Exact minimal-profile source-byte review and format-3 provenance; independent approved digest required before distribution/adoption. |
+| `SHA256SUMS` | SHA-256 of every approved deliverable and provenance sidecar | Verify actual file bytes; checksum agreement is not publisher authentication. |
+| `PROVENANCE.md` and MIT notice | Full release/source/generator/review SHAs and named asset digests; attribution | Review independently and retain MIT notice outside managed paths. |
 
-Prefer source and reviewed bundles in **GitHub Releases of their canonical
-upstream**, independently versioned. There is no technical need for another
-repository. Extra generated-only storage is justified only by private-history or
-separate access/retention requirements; it is not a third editable policy source.
+Only the minimal profile is proposed for v0.1.0. Backend, infrastructure and
+research profiles are omitted until their own exact-byte review; no empty
+artifacts. A CLI installer is not claimed: the bundle supplies reference files,
+not `ek` installation. GitHub automatic source archives and development caches
+are not substitutes for these usable bundles. Template qualifies its separate
+administrative bundle in its own repository and Release.
 
-Retain format 3: its exact six-file scope, source/generator/review provenance and
-external approved digest are useful even when the sources are public. Hosting is
-not a wire format. Deleting it would require a separate compatibility/security
-proposal and migration. Formats 1/2 remain private; do not rename publication or
-reinterpret an old private manifest because a repository becomes public. The
-original private manifest nested in format 3 remains provenance. Any future
-public-policy wording changes belong in the owning canonical sources, followed
-by review, new full pins and generated bytes; packaging does not redact rules.
+Private format-1/2 bundles remain compatibility/rollback evidence, never public
+fallbacks. Do not manufacture a PUBLIC-SAFE review, artifact approval or sync
+lock from a public license. Preparing source candidates does not clear generated
+asset bytes. No upload or public artifact distribution occurs in this task.
 
-Export at full SHA with existing Kit tools; review every byte, reproduce twice,
-compare hashes, retain each artifact and its independent approval. Consumers use
-existing sync plan/write, exact token and individual paths, separate locks and
-separate Draft PRs/native gates. Rollback uses the retained approved older bundle
-for that channel. No tag automatically re-pins a lock, activates skills, changes
-AGENTS, overwrites native CI or synchronizes the two versions. Preserve crash/
-quiescent-checkout limitations documented in [SYNC](SYNC.md).
+## Qualification and exact owner action
 
-The [historical audit](PUBLIC_READINESS.md) is superseded for source publication
-by [PUBLICATION.md](PUBLICATION.md); release assets remain separately qualified. Neither
-public source visibility nor a new SemVer tag clears old private-only policy,
-third-party rights or the twelve-file content review. Selected license/attribution
-may need separately reviewed release sidecars; never implicitly add LICENSE or
-NOTICE to the six managed-file sets without their own review. MIT is now selected; preserve its notice separately
-from the unchanged six-file protocols.
+1. Verify canonical GitHub ownership, public source/MIT, fresh accepted main,
+   candidate ancestry, complete tag inventory and every Release including drafts.
+   Reused names block a new release. Preserve the accepted source/history/rights
+   audits; review every newly reachable delta and relevant new workflow output.
+   Report inaccessible surfaces UNVERIFIED, never “no secrets” by inference.
+2. Run `python3 -B scripts/check_contract.py --self-check` and the full native
+   unittest suite. Require actual Python 3.11/3.12/3.13 hosted CI at the exact
+   full candidate head, independent technical ACCEPT and owner acceptance.
+3. Use existing export/distribution tools only with independently reviewed exact
+   source-byte classification. Generate twice privately, compare bytes, verify
+   every nested manifest file against canonical Git blobs and validate complete
+   SHA-256/provenance/notice agreement. Retain exact named bytes for review.
+4. Exercise both source channels' update/idempotence/rollback in disposable
+   repositories, preserving local/native files and unrelated active evidence.
+   The existing `scripts/check_source_updates.py` supports this without real
+   consumer writes. Synthetic tests are not approval of actual release artifacts.
+5. Finalize [narrative notes](RELEASE_NOTES_v0.1.0.md), compatibility, known limits
+   and rollback. Obtain separate owner approval **for Kit v0.1.0** naming the
+   exact commit, annotation, notes, canonical destination and each artifact digest.
+   Template v0.1.0 needs its own distinct approval. No merge authorization is
+   inferred from review/CI, and no release authority is inferred from merge.
 
-## Planned v0.1.0 assets
-
-Both releases distribute usable source/reference material, so their bundles are
-**applicable**, not documentation-only N/A. This is a concrete candidate inventory
-for these two releases under Template #6's canonical rule, not shared policy text.
-Names below are proposals, not existing files. Every applicable asset is
-**planned / BLOCKED**; no release asset is generated, attached or approved here.
-
-| Canonical Release | Applicability / candidate asset | Expected type and platform | Status / blocking qualification |
-| --- | --- | --- | --- |
-| Kit v0.1.0 | `kit-v0.1.0-minimal.public-safe.json`; default technical references | Format-3 UTF-8 JSON Kit bundle, minimal profile; source material, not a CLI installer | planned / BLOCKED: unresolved #11 content review plus gates below |
-| Kit v0.1.0 | `kit-v0.1.0-backend.public-safe.json`; backend-oriented references | Format-3 UTF-8 JSON Kit bundle, backend profile | planned / BLOCKED: a separate exact-byte profile audit is needed; minimal-profile clearance would not cover it |
-| Kit v0.1.0 | `kit-v0.1.0-infrastructure.public-safe.json`; infrastructure-oriented references | Format-3 UTF-8 JSON Kit bundle, infrastructure profile | planned / BLOCKED: separate profile audit and gates below; no deployment authority |
-| Kit v0.1.0 | `kit-v0.1.0-research.public-safe.json`; research-oriented references | Format-3 UTF-8 JSON Kit bundle, research profile | planned / BLOCKED: separate profile audit and gates below |
-| Template v0.1.0 | `template-v0.1.0-administrative.public-safe.json`; shared administrative updates | Format-3 UTF-8 JSON admin bundle, administrative profile, generated by the separately pinned Kit implementation | planned / BLOCKED: Template source/private-policy and link findings plus gates below |
-| Each of the above Releases | `SHA256SUMS` and `PROVENANCE.md`, each scoped to that Release's exact approved asset list | Checksum text and provenance evidence; no new manifest schema or editable version authority | planned / BLOCKED: actual bytes/digests and reviewed independent source/generator pins do not yet exist as approved release output |
-| Kit v0.1.0 | Native executable, wheel or installer | N/A: the supported CLI entrypoint is `python3 -B scripts/ek.py` from a reviewed source checkout; no standalone installation/package contract exists | N/A for this proposal; do not invent a packaging system or dummy installer |
-| Template v0.1.0 | Native executable or product binary | N/A: administrative content is delivered by the applicable bundle above; Template is not a native application | N/A; consumer applications keep their own local packaging/platform obligations |
-| Both Releases | GitHub-generated source archives | Supplementary source snapshots, not a replacement for the applicable bundles or an installed CLI package; Git export still requires a source Git checkout | Public exposure BLOCKED by whole-source/history/rights approval; no separate archive is generated or uploaded here |
-
-The JSON bytes are platform-neutral reference content. The supported generation/
-sync path is POSIX with Python 3.11+; export also requires Git and the correct
-trusted upstream checkout. These are not native Windows, Rust or product packages,
-and no Windows support or native product validation is inferred from their type.
-Template's bundle contains administrative content, not Kit CLI code; the Kit
-profile bundles likewise do not install the CLI or implicitly activate skills.
-
-For these candidates, qualification would establish:
-
-- **Source and repeatability:** finalize independently reviewed Kit and Template
-  release/source SHAs, plus the actual Kit generator SHA; generate twice only
-  after the separate authority gate, compare exact bytes, and verify every
-  manifest file hash against its canonical Git blob. One channel's v0.1.0 never
-  substitutes for the other's full source pin. Keep exactly the existing six
-  managed paths per bundle, and record any distinction between release, managed
-  source, generator and accepted merge commits.
-- **Integrity and provenance:** review each format-3 channel/owner/profile and
-  unchanged nested private manifest, review digest, per-file SHA-256 and complete
-  artifact SHA-256. SHA256SUMS would list the approved bundles and provenance
-  sidecar; PROVENANCE.md would identify their source/generator/review and exact
-  CI/independent-review evidence using existing fields, not another protocol.
-  Obtain the owner-approved artifact digest through an independent trusted
-  channel; a checksum downloaded beside a file is not publisher authentication.
-- **Practical verification:** require exact-head Python 3.11–3.13 checks in the
-  owning repository, independent review, reproducibility, tamper/channel/path/
-  symlink/stale-plan/permission regressions and disposable plan/write/rollback
-  checks with native/local files preserved. Template's own checker and tests
-  remain required alongside the Kit generator's checks. No real bundle is
-  generated by this documentation revision; synthetic unit fixtures are tests,
-  not candidate release assets. Consumer native/platform/security checks remain
-  separate gates before migration; they are not replaced by upstream Python CI.
-- **Publication gates:** resolve license and imported-source rights, historical
-  identity/reference disclosure and private-policy/link findings; complete an
-  exact-byte PUBLIC-SAFE review separately for every profile/channel. Then obtain
-  explicit owner approval of final target/annotation, asset names, bytes/digests,
-  attribution, notes and canonical destination. Until then, even successful
-  private fixtures cannot qualify an asset for upload. Any selected license/
-  notice sidecar needs its own named-byte review; none is selected or added here.
-
-Retained format-1/2 private bundles/locks remain private compatibility/rollback
-inputs, **not** public fallback assets. There is no relabeling, implicit promotion,
-new updater or change to the format-3 acceptance rules. Final approved asset
-hashes and sidecars would be recorded in each owning Release's evidence; none
-can be filled truthfully in this unpublished plan yet. Significant-release
-applicability for other repositories is defined by their local policy under
-Template #6, not by this matrix.
-
-## Read-only qualification routine
-
-`scripts/check_release.py` is a small **offline observation checker**, not an
-orchestrator, signer, publisher or authorization store. It reuses bounded Git/JSON
-readers and has no network/tag/release/write command. It currently qualifies only
-private staging observations and always returns `publication_authorized=false`.
-A public/public-safe classification is rejected, not inferred from passed tests.
-A separate owner/licensing review must design any later public qualification.
-
-1. Independently obtain fresh canonical refs and GitHub metadata, checking the
-   exact full candidate is accepted and an ancestor of accepted main. No source
-   fetch is hidden in the checker. Verify canonical identity/visibility, all tags
-   (`git ls-remote --tags`), **all** Releases including drafts, evidence origin,
-   workflow definition and exact source against GitHub. Existing same-name tag or
-   Release means that name is consumed, even if its target matches. Never move,
-   recreate or replace it; correct a release with a new version.
-2. Run mandatory source checks, exact-head Python 3.11–3.13 CI and independent
-   review at the candidate. Download a trustworthy observed run (example below).
-   JSON can be forged/stale: passing offline validation is not GitHub attestation.
-3. Use prepare mode before any owner-authorized tagging. No existing release JSON
-   should be supplied when the independently checked Release inventory is empty.
-   The tool checks the local exact tag ref; it cannot discover un-fetched remote
-   tags or a hidden/draft GitHub Release. These remain explicit mandatory checks.
-4. Only after separate owner approval of full targets, license, visibility,
-   release notes, named assets/digests and destination may the owner create an
-   annotated tag and GitHub Release. No such operations are part of this task.
-5. After an authorized release, record the annotation object's full ID in trusted
-   release evidence, separately from its peeled source SHA. Verify mode requires
-   that external ID, annotated commit/name, exact target, successful source CI and
-   non-draft/non-prerelease Release metadata. A changed annotation is refused even
-   if it peels to the same commit. Compare fresh remote refs/asset hashes and the
-   GitHub Release independently again. No GitHub tag protection/settings are
-   changed by this policy; enforced server immutability is UNVERIFIED. Report any
-   deletion/move as an incident; never silently accept a replacement snapshot.
+The existing `scripts/check_release.py` is an offline consistency checker. Its
+`--publication private` mode describes private staging observations even when
+source is public; it always returns `publication_authorized=false` and rejects
+public classification. It does not attest GitHub facts, history, licensing or
+artifact safety. Do not broaden it into an authority store to get a green gate.
 
 ```sh
-# Read-only GitHub snapshot, RUN is a verified exact-head native workflow run:
+# Obtain a real exact-head native run; retain its actual headSha and job names.
 gh run view RUN --repo AlexandrShapkin/codex-engineering-kit \
   --json headSha,status,conclusion,workflowName,jobs,url > /private/kit-ci.json
 python3 -B scripts/check_release.py --source /trusted/kit --project kit \
   --version v0.1.0 --target FULL_CANDIDATE_SHA --ci-json /private/kit-ci.json
-# For Template use --project template, its checkout and its own native CI snapshot.
-# After a separately authorized release, independently capture its real metadata:
-# gh api repos/OWNER/REPO/releases/tags/v0.1.0 > /private/release.json
-python3 -B scripts/check_release.py --source /trusted/kit --project kit \
-  --version v0.1.0 --target FULL_RELEASE_SHA --ci-json /private/kit-ci.json \
-  --phase verify --expected-tag-object RECORDED_ANNOTATION_OBJECT_SHA \
-  --release-json /private/release.json
 ```
 
-There are no real tags/Releases to verify yet; verify-mode negative/positive tests
-use synthetic tags exclusively in disposable private local repositories. Existing
-GitHub source CI is not a product build, native platform check, deployment proof,
-license grant, owner merge or release authorization.
+After separately approved publication, verify the full annotated tag-object ID,
+peeled commit, notes, canonical asset URLs and downloaded hashes. A changed tag
+is an incident; do not silently replace evidence. Server-enforced tag immutability
+is not established by local validation; no repository settings are changed here.
 
-## First targets and release notes
+## Rollback and limitations
 
-Accepted bases are Kit `450714d732ffc3c65ce82ae5a38071347f9ebce3` and Template
-`a99f391a7b0deedc1388c51f6d7d8e0e9958c45d`. They are audited anchors, not automatic
-release commitments. The private PR handoff proposes its full reviewed Kit HEAD
-as the candidate containing this qualification policy, and the accepted Template
-SHA as an **unchanged provisional candidate**. Neither is publicly releasable.
-If owner-selected license, policy fixes or a different merge target change bytes,
-select a new exact target and repeat audit delta, native CI and independent review.
-Do not guess a future merge SHA. Tagging a reviewed PR-head candidate is permissible
-only after owner acceptance and main ancestry; choosing a different merge SHA
-requires exact evidence for that SHA.
+Before adoption retain the accepted prior Git snapshot and both independent
+source records. Revert a reviewed candidate change normally; for later source
+updates use the retained older channel revision with a fresh exact plan and
+path permissions. Preserve local rules, native CI, MIT notices and unrelated work.
+Conflicts or interrupted writes require explicit snapshot recovery/replanning,
+never a forced reset or deleted lock. Published assets/tags are immutable: ship
+an explicitly approved new patch instead of overwriting them.
 
-[Draft first release notes](RELEASE_NOTES_v0.1.0.md) must be finalized with exact
-source/merge/annotation IDs, CI URLs, independent acceptance, classification,
-license and asset hashes before release. No self-referential version file or
-circular lock update is required. No VERSION constant was introduced.
-
-## Technical plan for Template #6 (no Template changes in this PR)
-
-1. Author the single canonical universal release/notes/artifact rule in Template's
-   managed instruction entrypoints under #6, with the required regression tests;
-   this Kit qualification is not a replacement. Use Template's own tags/Releases,
-   checker, eight+ tests and exact-head CI for its concrete release.
-2. Confirm current 35 tracked files/all nine reachable commits plus fresh refs,
-   metadata and any exposure surfaces have been cleared; obtain identity, rights
-   and license decisions. Preserve `is_template=true`; never toggle settings as
-   a byproduct. Review private-only OWNERSHIP/tooling/upgrade wording in its own PR.
-3. Keep both installed source pins, locks and retained bundles unchanged unless
-   that separately reviewed update requires new managed bytes. No forced re-export
-   merely to align SemVer. Record source vs package vs merge vs release revisions.
-4. Add policy/notes and any necessary attribution in a scoped Template #6 Draft PR
-   only when separately tasked; qualify the resulting exact candidate again.
-5. Preserve root AGENTS's explicit read of AGENTS.local.md, docs/INDEX and native
-   rules. [CLI observation](PUBLIC_READINESS.md#codex-cli-observation) establishes
-   instruction injection only; automatic overlay/model compliance is not proven.
-6. After owner release authorization, attach only named reviewed reproducible
-   artifacts to Template's own Release. Consumer migration, RustCraft #36 and
-   native just ci/Ubuntu/Windows remain separate authorized work under Kit #8.
+POSIX sync requires a quiescent checkout; per-file replacement is not a multi-file
+transaction. Descendants escaping the dedicated process group are outside Git
+observation cleanup. Hashes prove consistency, not ownership. Real Codex automatic
+instruction compliance remains unproven; existing explicit local-rule reads and
+native product gates remain mandatory. No release is ready until the evidence
+and exact named-byte owner approvals above are complete.
