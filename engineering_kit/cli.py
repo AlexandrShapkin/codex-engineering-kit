@@ -9,6 +9,7 @@ import sys
 
 from engineering_kit.sync import SyncError, export, plan, write, PROFILES
 from engineering_kit.distribution import generate
+from engineering_kit.source_update import plan_source, write_source
 from engineering_kit.contract import ContractError, requirements
 from engineering_kit.git_observe import ObservationError, observe
 
@@ -85,9 +86,26 @@ def main(argv: list[str] | None = None) -> int:
         if operation == "write":
             command.add_argument("--allow", action="append", default=[])
             command.add_argument("--plan-sha256", required=True)
+    source_update = subs.add_parser("source-update", description="Offline reviewed source proposals")
+    source_subs = source_update.add_subparsers(dest="operation", required=True)
+    for operation in ("plan", "write"):
+        command = source_subs.add_parser(operation)
+        command.add_argument("--channel", choices=("kit", "admin"), required=True)
+        command.add_argument("--root", type=Path, required=True)
+        command.add_argument("--source", type=Path, required=True)
+        command.add_argument("--revision", required=True)
+        if operation == "write":
+            command.add_argument("--allow", action="append", default=[])
+            command.add_argument("--plan-sha256", required=True)
     args = p.parse_args(argv)
     try:
-        if args.command == "distribution":
+        if args.command == "source-update":
+            if args.operation == "plan":
+                result, _ = plan_source(args.root, args.source, args.revision, args.channel)
+            else:
+                result = write_source(args.root, args.source, args.revision, args.channel,
+                                      args.allow, args.plan_sha256)
+        elif args.command == "distribution":
             result = generate(args.source, args.revision, args.profile, args.output,
                               args.channel, args.review, args.review_sha256,
                               args.generator_revision)

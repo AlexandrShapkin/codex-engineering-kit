@@ -9,3 +9,10 @@ Retain the prior reviewed private bundle before updating. Rollback applies that
 bundle through the same bounded admin channel and repeats native checks/review.
 Initial adoption explicitly replaced only the tracked root AGENTS.md; no general
 unmanaged-file overwrite permission is introduced. See [migration evidence](GOVERNANCE_AUDIT.md).
+
+## Accepted public-source migrations
+
+The four Kit #8 consumers have source.json records rather than bundle locks.
+Use the [source-update adapter and Draft proposal procedure](SOURCE_UPDATES.md)
+for those existing installations. Never feed source records to bundle sync or
+manufacture locks to bypass its unmanaged collision protection.

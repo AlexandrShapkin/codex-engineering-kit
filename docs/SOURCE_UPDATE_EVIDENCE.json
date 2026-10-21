@@ -1,0 +1,50 @@
+{
+  "rustcraft": {
+    "consumer_head": "e5088405f6000aba486b798f5c97d38e8a3e30e5",
+    "upstreams": {
+      "kit": "cdfc2050733388402a70674d22de3f9e7e2a5a74",
+      "admin": "8550ec7fa8f58dc41a8af652ff912b62ebf78c22"
+    },
+    "status": "PASS",
+    "files_preserved": 282,
+    "both_record_semantics_restored": true,
+    "record_serialization": "canonical sorted JSON; use reviewed Git revert for historical formatting",
+    "native_ci_executed_in_fixture": false
+  },
+  "assistant-hub": {
+    "consumer_head": "65b426a1f63c5a552788860757d1329d9f80e536",
+    "upstreams": {
+      "kit": "cdfc2050733388402a70674d22de3f9e7e2a5a74",
+      "admin": "8550ec7fa8f58dc41a8af652ff912b62ebf78c22"
+    },
+    "status": "PASS",
+    "files_preserved": 105,
+    "both_record_semantics_restored": true,
+    "record_serialization": "canonical sorted JSON; use reviewed Git revert for historical formatting",
+    "native_ci_executed_in_fixture": false
+  },
+  "codex-smart": {
+    "consumer_head": "2c27d141df4e44884c116e7d8e88e1c8a4f1fb59",
+    "upstreams": {
+      "kit": "cdfc2050733388402a70674d22de3f9e7e2a5a74",
+      "admin": "8550ec7fa8f58dc41a8af652ff912b62ebf78c22"
+    },
+    "status": "PASS",
+    "files_preserved": 291,
+    "both_record_semantics_restored": true,
+    "record_serialization": "canonical sorted JSON; use reviewed Git revert for historical formatting",
+    "native_ci_executed_in_fixture": false
+  },
+  "relayforge": {
+    "consumer_head": "dbcc3aba7a3dd05c32c6809f1097fe46eba66c98",
+    "upstreams": {
+      "kit": "cdfc2050733388402a70674d22de3f9e7e2a5a74",
+      "admin": "8550ec7fa8f58dc41a8af652ff912b62ebf78c22"
+    },
+    "status": "PASS",
+    "files_preserved": 105,
+    "both_record_semantics_restored": true,
+    "record_serialization": "canonical sorted JSON; use reviewed Git revert for historical formatting",
+    "native_ci_executed_in_fixture": false
+  }
+}

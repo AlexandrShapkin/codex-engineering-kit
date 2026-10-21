@@ -1,0 +1,909 @@
+{
+  "date": "2026-10-21",
+  "consumers": {
+    "rustcraft": {
+      "main": "e5088405f6000aba486b798f5c97d38e8a3e30e5",
+      "migration_pr": 37,
+      "issue": 35,
+      "ci": [
+        {
+          "id": 39539173990,
+          "name": "ci",
+          "event": "push",
+          "head_sha": "e5088405f6000aba486b798f5c97d38e8a3e30e5",
+          "conclusion": "success",
+          "html_url": "https://github.com/AlexandrShapkin/rustcraft/actions/runs/39539173990",
+          "jobs": [
+            {
+              "name": "rust (windows-latest)",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Verify reviewed governance sources",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Documentation tool tests",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Workspace status tests",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "F1 field wrapper tests",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Documentation integrity (offline)",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run dtolnay/rust-toolchain@stable",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Format",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Check",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Test",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Clippy",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "conclusion": "success"
+                }
+              ]
+            },
+            {
+              "name": "rust (ubuntu-latest)",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Verify reviewed governance sources",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Documentation tool tests",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Workspace status tests",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "F1 field wrapper tests",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Documentation integrity (offline)",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run dtolnay/rust-toolchain@stable",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Format",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Check",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Test",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Clippy",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "conclusion": "success"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "method": "reviewed-public-source-migration",
+          "repository": "AlexandrShapkin/codex-engineering-kit",
+          "revision": "f808af695c7787fb68f332d8ff1214fb2100f9b5",
+          "license_at": "cdfc2050733388402a70674d22de3f9e7e2a5a74",
+          "files": {
+            ".engineering-kit/contract/AGENT_COMMON.md": {
+              "source_path": "contract/AGENT_COMMON.md",
+              "sha256": "3465b1b6a879859b3b327466f4c069d25a8cf50c0b0dd9b2bf4e5a75959714be"
+            },
+            ".engineering-kit/contract/DEVELOPMENT_INTERFACE.md": {
+              "source_path": "contract/DEVELOPMENT_INTERFACE.md",
+              "sha256": "f1b7f088b1475d29b09830e459570544e57323c9ab11744ade805aa31e2b29c6"
+            },
+            ".engineering-kit/skills/ek-context/SKILL.md": {
+              "source_path": "skills/ek-context/SKILL.md",
+              "sha256": "8ff6fd5cb4597418ba52a84cca775ed9765ea97c832473fd12b4e8406ca5b482"
+            },
+            ".engineering-kit/skills/ek-pr-closeout/SKILL.md": {
+              "source_path": "skills/ek-pr-closeout/SKILL.md",
+              "sha256": "e70f3629b31b3c9d64a80d092bef906691c6bad499e01f40f3bc0d1362fcb0fb"
+            },
+            ".engineering-kit/skills/ek-verify/SKILL.md": {
+              "source_path": "skills/ek-verify/SKILL.md",
+              "sha256": "953af86f8b3581ef8acb5310c34bd0a2359761bb2ba2f4ee1a4be2aaed2a3de8"
+            },
+            ".engineering-kit/PROFILE.md": {
+              "source_path": "profiles/sync/minimal.md",
+              "sha256": "84e63ea30041e1c68c70d569be93005978dcc9530f77c7a8ebbaa2c6cd735eb0"
+            }
+          }
+        },
+        {
+          "method": "reviewed-public-source-migration",
+          "repository": "AlexandrShapkin/project-template",
+          "revision": "d15d0a20b91f54be1a27b78d90f9d367b2e46408",
+          "license_at": "8550ec7fa8f58dc41a8af652ff912b62ebf78c22",
+          "files": {
+            "AGENTS.md": {
+              "source_path": "AGENTS.md",
+              "sha256": "f2bd56969e314ae5f89c8fad4a5bb3e00efc6c7f2170523e9b06da81e1b7cb69"
+            },
+            ".github/DEVELOPMENT_INTERFACE.md": {
+              "source_path": ".github/DEVELOPMENT_INTERFACE.md",
+              "sha256": "0608d6582bd25052dc1a3c3dac63845b7efc58bf131682ff92f6f244ed80a433"
+            },
+            ".github/ISSUE_TEMPLATE/task.yml": {
+              "source_path": ".github/ISSUE_TEMPLATE/task.yml",
+              "sha256": "4e0302c98a6a9ebfe1d78dc09865d81080e2487d71b5753e2e4d299ae1537dfb"
+            },
+            ".github/pull_request_template.md": {
+              "source_path": ".github/pull_request_template.md",
+              "sha256": "981a47114f1158431f56f94b4aad1e799a8669baac93de1198cd26d80699725b"
+            },
+            ".project-template/OWNERSHIP.md": {
+              "source_path": ".project-template/OWNERSHIP.md",
+              "sha256": "4aac2285025e41b8f30ea1635e53c2260d558500117df7b89db5f84c4e55dc77"
+            },
+            "docs/WORKFLOW.md": {
+              "source_path": "docs/WORKFLOW.md",
+              "sha256": "923fd338abe7aa969505f52c764f5fae2921e3feaae681957b664415754988a6"
+            }
+          }
+        }
+      ],
+      "native_local_sha256": "0b49d2cb5b7212eef66e165495a564524d69b649fa28651f781276e11fa6f8a3",
+      "native_workflows_sha256": {
+        "release.yml": "0fa8337103446011e0fd0d6ba900c6989c85f5ecea83f5c473f036800ad6f686",
+        "ci.yml": "66efead0b8e48866fc3b207aee37edf5a03da3d3867edf8eb42dbc7c2550725b"
+      },
+      "superseded": [
+        {
+          "number": 36,
+          "state": "OPEN",
+          "head": "09e5b3ecd482db53b6919c329ab348e230572f94",
+          "files": [
+            ".github/DEVELOPMENT_INTERFACE.md",
+            ".github/workflows/ci.yml",
+            "AGENTS.md",
+            "scripts/check_agent_contract.py",
+            "scripts/test_agent_contract.py"
+          ],
+          "recommendation": "Leave open pending explicit owner closure authorization; do not merge competing lifecycle."
+        }
+      ],
+      "source_tests_log": "rustcraft-main-source-tests.txt"
+    },
+    "assistant-hub": {
+      "main": "65b426a1f63c5a552788860757d1329d9f80e536",
+      "migration_pr": 61,
+      "issue": 59,
+      "ci": [
+        {
+          "id": 39539186953,
+          "name": "checks",
+          "event": "push",
+          "head_sha": "65b426a1f63c5a552788860757d1329d9f80e536",
+          "conclusion": "success",
+          "html_url": "https://github.com/AlexandrShapkin/assistant-hub/actions/runs/39539186953",
+          "jobs": [
+            {
+              "name": "offline UI check",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/setup-node@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run for module in web/*.mjs web/tests/*.mjs src/assistant_hub/local_web/*.mjs; do",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run node --test web/tests/*.test.mjs",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/setup-node@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "conclusion": "success"
+                }
+              ]
+            },
+            {
+              "name": "test (3.13)",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python -m unittest discover -s tests -v",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python -m compileall -q src tests scripts",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python -m assistant_hub doctor",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python scripts/check_public_tree.py",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "conclusion": "success"
+                }
+              ]
+            },
+            {
+              "name": "test (3.12)",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python -m unittest discover -s tests -v",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python -m compileall -q src tests scripts",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python -m assistant_hub doctor",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python scripts/check_public_tree.py",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "conclusion": "success"
+                }
+              ]
+            },
+            {
+              "name": "test (3.11)",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python -m unittest discover -s tests -v",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python -m compileall -q src tests scripts",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python -m assistant_hub doctor",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python scripts/check_public_tree.py",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/setup-python@v5",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "conclusion": "success"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "method": "reviewed-public-source-migration",
+          "repository": "AlexandrShapkin/codex-engineering-kit",
+          "revision": "f808af695c7787fb68f332d8ff1214fb2100f9b5",
+          "license_at": "cdfc2050733388402a70674d22de3f9e7e2a5a74",
+          "files": {
+            ".engineering-kit/contract/AGENT_COMMON.md": {
+              "source_path": "contract/AGENT_COMMON.md",
+              "sha256": "3465b1b6a879859b3b327466f4c069d25a8cf50c0b0dd9b2bf4e5a75959714be"
+            },
+            ".engineering-kit/contract/DEVELOPMENT_INTERFACE.md": {
+              "source_path": "contract/DEVELOPMENT_INTERFACE.md",
+              "sha256": "f1b7f088b1475d29b09830e459570544e57323c9ab11744ade805aa31e2b29c6"
+            },
+            ".engineering-kit/skills/ek-context/SKILL.md": {
+              "source_path": "skills/ek-context/SKILL.md",
+              "sha256": "8ff6fd5cb4597418ba52a84cca775ed9765ea97c832473fd12b4e8406ca5b482"
+            },
+            ".engineering-kit/skills/ek-pr-closeout/SKILL.md": {
+              "source_path": "skills/ek-pr-closeout/SKILL.md",
+              "sha256": "e70f3629b31b3c9d64a80d092bef906691c6bad499e01f40f3bc0d1362fcb0fb"
+            },
+            ".engineering-kit/skills/ek-verify/SKILL.md": {
+              "source_path": "skills/ek-verify/SKILL.md",
+              "sha256": "953af86f8b3581ef8acb5310c34bd0a2359761bb2ba2f4ee1a4be2aaed2a3de8"
+            },
+            ".engineering-kit/PROFILE.md": {
+              "source_path": "profiles/sync/minimal.md",
+              "sha256": "84e63ea30041e1c68c70d569be93005978dcc9530f77c7a8ebbaa2c6cd735eb0"
+            }
+          }
+        },
+        {
+          "method": "reviewed-public-source-migration",
+          "repository": "AlexandrShapkin/project-template",
+          "revision": "d15d0a20b91f54be1a27b78d90f9d367b2e46408",
+          "license_at": "8550ec7fa8f58dc41a8af652ff912b62ebf78c22",
+          "files": {
+            "AGENTS.md": {
+              "source_path": "AGENTS.md",
+              "sha256": "f2bd56969e314ae5f89c8fad4a5bb3e00efc6c7f2170523e9b06da81e1b7cb69"
+            },
+            ".github/DEVELOPMENT_INTERFACE.md": {
+              "source_path": ".github/DEVELOPMENT_INTERFACE.md",
+              "sha256": "0608d6582bd25052dc1a3c3dac63845b7efc58bf131682ff92f6f244ed80a433"
+            },
+            ".github/ISSUE_TEMPLATE/task.yml": {
+              "source_path": ".github/ISSUE_TEMPLATE/task.yml",
+              "sha256": "4e0302c98a6a9ebfe1d78dc09865d81080e2487d71b5753e2e4d299ae1537dfb"
+            },
+            ".github/pull_request_template.md": {
+              "source_path": ".github/pull_request_template.md",
+              "sha256": "981a47114f1158431f56f94b4aad1e799a8669baac93de1198cd26d80699725b"
+            },
+            ".project-template/OWNERSHIP.md": {
+              "source_path": ".project-template/OWNERSHIP.md",
+              "sha256": "4aac2285025e41b8f30ea1635e53c2260d558500117df7b89db5f84c4e55dc77"
+            },
+            "docs/WORKFLOW.md": {
+              "source_path": "docs/WORKFLOW.md",
+              "sha256": "923fd338abe7aa969505f52c764f5fae2921e3feaae681957b664415754988a6"
+            }
+          }
+        }
+      ],
+      "native_local_sha256": "14b49c0fc55c505d5cb6f24d3a3ec27a3aff1b6340ae9c6f330cc0c18aa88256",
+      "native_workflows_sha256": {
+        "pages-preview.yml": "b083d680bc8d31330a74f606f7c8eb515fa2beb4585264004bc21275cfa08e4c",
+        "ci.yml": "0c22c59be4b07c56a4e8d722d31ceb1292d97e80aab1d1dd73cf736e203b22d4"
+      },
+      "superseded": [
+        {
+          "number": 60,
+          "state": "OPEN",
+          "head": "cb98ed5945e7a844990cd0f944ed235f3478ff63",
+          "files": [
+            ".github/DEVELOPMENT_INTERFACE.md",
+            ".github/workflows/ci.yml",
+            "AGENTS.md",
+            "scripts/check_agent_contract.py",
+            "scripts/test_agent_contract.py"
+          ],
+          "recommendation": "Leave open pending explicit owner closure authorization; do not merge competing lifecycle."
+        }
+      ],
+      "source_tests_log": "assistant-hub-main-source-tests.txt"
+    },
+    "codex-smart": {
+      "main": "2c27d141df4e44884c116e7d8e88e1c8a4f1fb59",
+      "migration_pr": 177,
+      "issue": 169,
+      "ci": [
+        {
+          "id": 39539994960,
+          "name": "Security",
+          "event": "push",
+          "head_sha": "2c27d141df4e44884c116e7d8e88e1c8a4f1fb59",
+          "conclusion": "success",
+          "html_url": "https://github.com/AlexandrShapkin/codex-smart/actions/runs/39539994960",
+          "jobs": [
+            {
+              "name": "review",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run ./.github/actions/setup-just",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run rustup toolchain install 1.98.0 --profile minimal",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run cargo +1.98.0 fetch --locked",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Install pinned security checker in CI",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Fetch public advisory database explicitly",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Dependency provenance, advisories, licenses, bans and sources",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "conclusion": "success"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 39539994911,
+          "name": "CI",
+          "event": "push",
+          "head_sha": "2c27d141df4e44884c116e7d8e88e1c8a4f1fb59",
+          "conclusion": "success",
+          "html_url": "https://github.com/AlexandrShapkin/codex-smart/actions/runs/39539994911",
+          "jobs": [
+            {
+              "name": "check",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Verify reviewed governance sources",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run ./.github/actions/setup-just",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run rustup toolchain install 1.98.0 --profile minimal --component rustfmt,clippy",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run just check",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "conclusion": "success"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "method": "reviewed-public-source-migration",
+          "repository": "AlexandrShapkin/codex-engineering-kit",
+          "revision": "f808af695c7787fb68f332d8ff1214fb2100f9b5",
+          "license_at": "cdfc2050733388402a70674d22de3f9e7e2a5a74",
+          "files": {
+            ".engineering-kit/contract/AGENT_COMMON.md": {
+              "source_path": "contract/AGENT_COMMON.md",
+              "sha256": "3465b1b6a879859b3b327466f4c069d25a8cf50c0b0dd9b2bf4e5a75959714be"
+            },
+            ".engineering-kit/contract/DEVELOPMENT_INTERFACE.md": {
+              "source_path": "contract/DEVELOPMENT_INTERFACE.md",
+              "sha256": "f1b7f088b1475d29b09830e459570544e57323c9ab11744ade805aa31e2b29c6"
+            },
+            ".engineering-kit/skills/ek-context/SKILL.md": {
+              "source_path": "skills/ek-context/SKILL.md",
+              "sha256": "8ff6fd5cb4597418ba52a84cca775ed9765ea97c832473fd12b4e8406ca5b482"
+            },
+            ".engineering-kit/skills/ek-pr-closeout/SKILL.md": {
+              "source_path": "skills/ek-pr-closeout/SKILL.md",
+              "sha256": "e70f3629b31b3c9d64a80d092bef906691c6bad499e01f40f3bc0d1362fcb0fb"
+            },
+            ".engineering-kit/skills/ek-verify/SKILL.md": {
+              "source_path": "skills/ek-verify/SKILL.md",
+              "sha256": "953af86f8b3581ef8acb5310c34bd0a2359761bb2ba2f4ee1a4be2aaed2a3de8"
+            },
+            ".engineering-kit/PROFILE.md": {
+              "source_path": "profiles/sync/minimal.md",
+              "sha256": "84e63ea30041e1c68c70d569be93005978dcc9530f77c7a8ebbaa2c6cd735eb0"
+            }
+          }
+        },
+        {
+          "method": "reviewed-public-source-migration",
+          "repository": "AlexandrShapkin/project-template",
+          "revision": "d15d0a20b91f54be1a27b78d90f9d367b2e46408",
+          "license_at": "8550ec7fa8f58dc41a8af652ff912b62ebf78c22",
+          "files": {
+            "AGENTS.md": {
+              "source_path": "AGENTS.md",
+              "sha256": "f2bd56969e314ae5f89c8fad4a5bb3e00efc6c7f2170523e9b06da81e1b7cb69"
+            },
+            ".github/DEVELOPMENT_INTERFACE.md": {
+              "source_path": ".github/DEVELOPMENT_INTERFACE.md",
+              "sha256": "0608d6582bd25052dc1a3c3dac63845b7efc58bf131682ff92f6f244ed80a433"
+            },
+            ".github/ISSUE_TEMPLATE/task.yml": {
+              "source_path": ".github/ISSUE_TEMPLATE/task.yml",
+              "sha256": "4e0302c98a6a9ebfe1d78dc09865d81080e2487d71b5753e2e4d299ae1537dfb"
+            },
+            ".github/pull_request_template.md": {
+              "source_path": ".github/pull_request_template.md",
+              "sha256": "981a47114f1158431f56f94b4aad1e799a8669baac93de1198cd26d80699725b"
+            },
+            ".project-template/OWNERSHIP.md": {
+              "source_path": ".project-template/OWNERSHIP.md",
+              "sha256": "4aac2285025e41b8f30ea1635e53c2260d558500117df7b89db5f84c4e55dc77"
+            },
+            "docs/WORKFLOW.md": {
+              "source_path": "docs/WORKFLOW.md",
+              "sha256": "923fd338abe7aa969505f52c764f5fae2921e3feaae681957b664415754988a6"
+            }
+          }
+        }
+      ],
+      "native_local_sha256": "03b2f0ffcadc25c17c1e650e5bc0527b4296c4a31249c62b61864bdff2bf39e1",
+      "native_workflows_sha256": {
+        "security.yml": "eb54b123104cd9c108061fe74192baeac99290704f210bd2b5aa570ed00cab2a",
+        "release.yml": "5c1df1dc0c84a65042cc12ab9b8a8531119e397cca4d933b9485925ca003a674",
+        "ci.yml": "2290b03aba332eef6053102297c7b771a6405ea560e62f4197e400db8e603247"
+      },
+      "superseded": [
+        {
+          "number": 170,
+          "state": "OPEN",
+          "head": "fb86c3a8e1dff970b6fa4f8bc085d8e62f2686e3",
+          "files": [
+            ".github/DEVELOPMENT_INTERFACE.md",
+            ".github/ISSUE_TEMPLATE/task.yml",
+            ".github/labels.json",
+            ".github/pull_request_template.md",
+            "AGENTS.md",
+            "README.md",
+            "docs/documents.json",
+            "docs/index.md",
+            "justfile",
+            "scripts/prepared_doctor.py",
+            "scripts/test_prepared_doctor.py"
+          ],
+          "recommendation": "Leave open pending explicit owner closure authorization; do not merge competing lifecycle."
+        },
+        {
+          "number": 176,
+          "state": "OPEN",
+          "head": "982749389c23615a5fa65fbb3b99c01d0a94de1d",
+          "files": [
+            ".github/DEVELOPMENT_INTERFACE.md",
+            ".github/workflows/ci.yml",
+            "AGENTS.md",
+            "scripts/check_agent_contract.py",
+            "scripts/test_agent_contract.py"
+          ],
+          "recommendation": "Leave open pending explicit owner closure authorization; do not merge competing lifecycle."
+        }
+      ],
+      "source_tests_log": "codex-smart-main-source-tests.txt"
+    },
+    "relayforge": {
+      "main": "dbcc3aba7a3dd05c32c6809f1097fe46eba66c98",
+      "migration_pr": 81,
+      "issue": 79,
+      "ci": [
+        {
+          "id": 39540755675,
+          "name": "Rust checks",
+          "event": "push",
+          "head_sha": "dbcc3aba7a3dd05c32c6809f1097fe46eba66c98",
+          "conclusion": "success",
+          "html_url": "https://github.com/AlexandrShapkin/relayforge/actions/runs/39540755675",
+          "jobs": [
+            {
+              "name": "test",
+              "conclusion": "success",
+              "steps": [
+                {
+                  "name": "Set up job",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Parse inert autonomy metadata (Python 3.11+)",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Verify reviewed governance sources",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run dtolnay/rust-toolchain@stable",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Install pinned just for recipe regression tests",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run python3 -B -m unittest discover -s scripts -p 'test_*.py'",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run cargo fmt --all -- --check",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run cargo clippy --workspace --all-targets --locked -- -D warnings",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Run cargo test --workspace --locked",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Check shared developer interface syntax and offline status",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Post Run actions/checkout@v4",
+                  "conclusion": "success"
+                },
+                {
+                  "name": "Complete job",
+                  "conclusion": "success"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "method": "reviewed-public-source-migration",
+          "repository": "AlexandrShapkin/codex-engineering-kit",
+          "revision": "f808af695c7787fb68f332d8ff1214fb2100f9b5",
+          "license_at": "cdfc2050733388402a70674d22de3f9e7e2a5a74",
+          "files": {
+            ".engineering-kit/contract/AGENT_COMMON.md": {
+              "source_path": "contract/AGENT_COMMON.md",
+              "sha256": "3465b1b6a879859b3b327466f4c069d25a8cf50c0b0dd9b2bf4e5a75959714be"
+            },
+            ".engineering-kit/contract/DEVELOPMENT_INTERFACE.md": {
+              "source_path": "contract/DEVELOPMENT_INTERFACE.md",
+              "sha256": "f1b7f088b1475d29b09830e459570544e57323c9ab11744ade805aa31e2b29c6"
+            },
+            ".engineering-kit/skills/ek-context/SKILL.md": {
+              "source_path": "skills/ek-context/SKILL.md",
+              "sha256": "8ff6fd5cb4597418ba52a84cca775ed9765ea97c832473fd12b4e8406ca5b482"
+            },
+            ".engineering-kit/skills/ek-pr-closeout/SKILL.md": {
+              "source_path": "skills/ek-pr-closeout/SKILL.md",
+              "sha256": "e70f3629b31b3c9d64a80d092bef906691c6bad499e01f40f3bc0d1362fcb0fb"
+            },
+            ".engineering-kit/skills/ek-verify/SKILL.md": {
+              "source_path": "skills/ek-verify/SKILL.md",
+              "sha256": "953af86f8b3581ef8acb5310c34bd0a2359761bb2ba2f4ee1a4be2aaed2a3de8"
+            },
+            ".engineering-kit/PROFILE.md": {
+              "source_path": "profiles/sync/minimal.md",
+              "sha256": "84e63ea30041e1c68c70d569be93005978dcc9530f77c7a8ebbaa2c6cd735eb0"
+            }
+          }
+        },
+        {
+          "method": "reviewed-public-source-migration",
+          "repository": "AlexandrShapkin/project-template",
+          "revision": "d15d0a20b91f54be1a27b78d90f9d367b2e46408",
+          "license_at": "8550ec7fa8f58dc41a8af652ff912b62ebf78c22",
+          "files": {
+            "AGENTS.md": {
+              "source_path": "AGENTS.md",
+              "sha256": "f2bd56969e314ae5f89c8fad4a5bb3e00efc6c7f2170523e9b06da81e1b7cb69"
+            },
+            ".github/DEVELOPMENT_INTERFACE.md": {
+              "source_path": ".github/DEVELOPMENT_INTERFACE.md",
+              "sha256": "0608d6582bd25052dc1a3c3dac63845b7efc58bf131682ff92f6f244ed80a433"
+            },
+            ".github/ISSUE_TEMPLATE/task.yml": {
+              "source_path": ".github/ISSUE_TEMPLATE/task.yml",
+              "sha256": "4e0302c98a6a9ebfe1d78dc09865d81080e2487d71b5753e2e4d299ae1537dfb"
+            },
+            ".github/pull_request_template.md": {
+              "source_path": ".github/pull_request_template.md",
+              "sha256": "981a47114f1158431f56f94b4aad1e799a8669baac93de1198cd26d80699725b"
+            },
+            ".project-template/OWNERSHIP.md": {
+              "source_path": ".project-template/OWNERSHIP.md",
+              "sha256": "4aac2285025e41b8f30ea1635e53c2260d558500117df7b89db5f84c4e55dc77"
+            },
+            "docs/WORKFLOW.md": {
+              "source_path": "docs/WORKFLOW.md",
+              "sha256": "923fd338abe7aa969505f52c764f5fae2921e3feaae681957b664415754988a6"
+            }
+          }
+        }
+      ],
+      "native_local_sha256": "3890afd7384cd844085170e5842796432563125a7cfa3178f5250e029d2664b4",
+      "native_workflows_sha256": {
+        "tests.yml": "95aa5b45fd50f3a854d10a00cd9b3e597d780606ed3ea7f21427afe81cfd099f",
+        "rdc-independent.yml": "3674f02784c2eb9a1a38b233fa7036192d97454cd36f5f242c1c726f8c6cf673"
+      },
+      "superseded": [
+        {
+          "number": 80,
+          "state": "OPEN",
+          "head": "ca8904fec6c1b57eabf9b971fca8ecf815131d12",
+          "files": [
+            ".github/DEVELOPMENT_INTERFACE.md",
+            ".github/workflows/tests.yml",
+            "AGENTS.md",
+            "scripts/check_agent_contract.py",
+            "scripts/test_agent_contract.py"
+          ],
+          "recommendation": "Leave open pending explicit owner closure authorization; do not merge competing lifecycle."
+        }
+      ],
+      "source_tests_log": "relayforge-main-source-tests.txt"
+    }
+  }
+}
