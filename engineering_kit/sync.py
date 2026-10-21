@@ -213,6 +213,13 @@ def plan(root, bundle, channel='kit', public_bundle_sha256=None):
     lock_data = read(location(root, lock))
     old = metadata(load(lock_data), channel, public) if lock_data is not None else None
     previous = (old['source'] if public else old)['files'] if old else {}
+    return file_plan(root, lock, lock_data, previous, manifest, contents,
+                     source['upstream'], source['profile'])
+
+
+def file_plan(root, lock, lock_data, previous, manifest, contents, upstream, profile):
+    """Shared drift checks, state-bound token and deterministic path plan."""
+    root = Path(os.path.abspath(root))
     changes = []
     snapshots = {lock: lock_data}
     for name in sorted(set(previous) | set(contents)):
@@ -236,12 +243,17 @@ def plan(root, bundle, channel='kit', public_bundle_sha256=None):
                             'manifest': manifest, 'changes': changes,
                             'before': {n: digest(v) if v is not None else None
                                        for n, v in snapshots.items()}}))
-    return {'changes': changes, 'plan_sha256': token, 'upstream': source['upstream'],
-            'profile': source['profile']}, contents
+    return {'changes': changes, 'plan_sha256': token, 'upstream': upstream,
+            'profile': profile}, contents
 
 
 def write(root, bundle, allowed, token, channel='kit', public_bundle_sha256=None):
     result, contents = plan(root, bundle, channel, public_bundle_sha256)
+    return apply_plan(root, result, contents, allowed, token)
+
+
+def apply_plan(root, result, contents, allowed, token):
+    """Shared exact permission preflight and per-file replacement; record last."""
     paths = {c['path'] for c in result['changes']}
     if token != result['plan_sha256'] or set(allowed) != paths:
         raise SyncError('exact plan SHA and exact --allow path set required')
