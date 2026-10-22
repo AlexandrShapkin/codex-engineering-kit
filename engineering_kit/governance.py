@@ -4,12 +4,12 @@ from pathlib import Path
 
 from engineering_kit.sync import ADMIN_PATHS, ADMIN_LOCK, bundle_read, digest, location, metadata
 
-ADMIN_SOURCE = '84fedb44125ab6316ca7e0a147ec7b98f5fc81e6'
-TEMPLATE_MAIN = '5087295b7e571e87c3f70f721e26ff4ca7a2e315'
+ADMIN_SOURCE = '51e2fb06aed0245096a5b7bacbc937a3eca488d2'
+TEMPLATE_MAIN = 'bd9f586937100ec522fd1fd9c24a2888c464111a'
 # Independently reviewed source/export bytes; updating requires a migration PR.
 SOURCE_HASHES = {
     '.project-template/bundles/initial.json':
-        '4e30a1dec8814834868d08ca487d252fe86ddd45abdacd793747caa1a41100e8',
+        '976831829e7314736beebbdea6f07301b2f9c22c2a78626fc1470cf8be16adb6',
     '.github/labels.json':
         'd84d08b1828df0ce1f07d8330ff48090513369b2e1463efaae50c7bde145acd8',
     'scripts/check_github_metadata.py':
