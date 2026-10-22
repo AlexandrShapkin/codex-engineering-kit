@@ -1,6 +1,6 @@
 # Kit-specific agent rules
 
-Read [docs/PROJECT.md](docs/PROJECT.md) for technical context.
+Consult [docs/PROJECT.md](docs/PROJECT.md) for task-relevant technical context.
 The active shared lifecycle is discovered through root AGENTS.md;
 contract/ snapshots remain frozen compatibility/provenance.
 

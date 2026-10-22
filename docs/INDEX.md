@@ -1,7 +1,6 @@
 # Kit documentation
 
-Read [PROJECT.md](PROJECT.md), [AGENTS.local.md](../AGENTS.local.md) and the
-[canonical interface](../.github/DEVELOPMENT_INTERFACE.md) first.
+Navigation only. Follow [AGENTS.md](../AGENTS.md) and mandatory [AGENTS.local.md](../AGENTS.local.md) at task entry; consult [PROJECT.md](PROJECT.md) and relevant sections of the [canonical interface](../.github/DEVELOPMENT_INTERFACE.md) as needed.
 
 - Technical context: [CLI](CLI.md), [sync](SYNC.md), [public distribution](PUBLIC_DISTRIBUTION.md).
 - Source publication: [current status](PUBLICATION.md), [source rights](SOURCE_RIGHTS.md).
