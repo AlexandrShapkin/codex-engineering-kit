@@ -22,4 +22,8 @@ to work until individually migrated; no global switch or contract rewrite.
 Administrative releases use full source commit SHAs in .project-template/lock.json;
 Kit uses .engineering-kit/lock.json independently. Scaffold/local docs deliberately
 do not receive automatic updates. Propose manual improvements without overwriting
-project content. Both distributions remain private pending owner publication review.
+project content. Source repository visibility and licensing are distinct from
+transport classification. Formats 1/2 remain private; reviewed public delivery
+uses format 3 and its external approved digest. Never relabel an existing lock.
+Retain the canonical source copyright/permission notice in project-owned licensing,
+outside these six managed paths; source publication does not expand sync ownership.
