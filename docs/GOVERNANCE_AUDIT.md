@@ -104,3 +104,22 @@ checks/CI. No history rewriting. Subsequent admin upgrades use the retained prio
 private bundle and existing exact-plan/path sync; preserve AGENTS.local.md and
 technical pins. Server rollback is unnecessary because existing metadata was not
 changed; the Draft's own labels need no removal.
+
+## Solo-maintainer rollout — Template #16 / Kit #8
+
+Bounded owner-authorized six-repository rollout. Canonical Template PR #17
+HEAD `355788547e62ce8fc582e847f0131a541702a1b0` independently ACCEPTED;
+merged at `cd08531493b34c98f0587544cd09e36c5da8fb11`. Administrative source
+`935022f96e0654d997d511dce79ab022dcae9d92`; bundle SHA-256
+`2a7d49f98b6d7678b50ef750e4e1d162793a732283b5e2fc6b5cc74333b65143`.
+Existing admin sync plan/write used with four exact paths and digest
+`295ea5a77edc4d9f23dd8338fba4d34827d04d4568de3bfa5e0dce1fe4189f02`.
+Scope: canonical policy and provenance pins only; frozen contracts, CLI, local
+rules, native/security CI and branch protection preserved. Rollback: reviewed
+revert or prior retained bundle through fresh exact-path sync. Native checks,
+exact-head hosted CI and independent review are recorded on the bounded PR.
+Consumers follow via existing source-update plan/write, administrative channel
+only; technical source pins remain unchanged because frozen payloads are unchanged.
+Retained isolated /tmp/solo-governance-*-20261023 checkouts and admin bundle are
+review/rollback evidence owned by Template #16 / Kit #8; retain through rollout
+and independent acceptance. No cleanup or release/runtime authority inferred.
