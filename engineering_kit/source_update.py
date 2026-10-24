@@ -120,7 +120,9 @@ def plan_source(root, source, revision, channel):
     # Use the same validated bytes as the write proposal, including its record.
     # Presentation only: the existing plan digest and exact allowlist still bind writes.
     result['text_diffs'] = {
-        c['path']: ''.join(difflib.unified_diff(
+        c['path']: ''.join(line if line.endswith('\n') else
+                          line + '\n\\ No newline at end of file\n'
+                          for line in difflib.unified_diff(
             read(location(root, c['path'])).decode('utf-8').splitlines(keepends=True),
             contents[c['path']].decode('utf-8').splitlines(keepends=True),
             fromfile='a/' + c['path'], tofile='b/' + c['path']))

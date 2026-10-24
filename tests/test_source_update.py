@@ -130,6 +130,26 @@ class SourceUpdateTests(unittest.TestCase):
         self.apply('admin', self.pins['admin'][1])
         self.assertEqual(self.proposal()[0]['text_diffs'], {})
 
+    def test_text_diff_distinguishes_missing_final_newline(self):
+        changed = next(iter(sorted(source_map('admin').values())))
+        path = self.sources['admin'] / changed
+        path.write_text('without final newline')
+        first = self.commit('admin')
+        self.apply('admin', first)
+        path.write_text('without final newline\n')
+        second = self.commit('admin')
+        p, _ = self.proposal(pin=second)
+        self.assertIn('-without final newline\n\\ No newline at end of file\n'
+                      '+without final newline\n', p['text_diffs'][changed])
+        # Both sides lacking LF must also remain distinct diff lines.
+        path.write_text('changed without final newline')
+        third = self.commit('admin')
+        self.apply('admin', first)
+        p, _ = self.proposal(pin=third)
+        self.assertIn('-without final newline\n\\ No newline at end of file\n'
+                      '+changed without final newline\n\\ No newline at end of file\n',
+                      p['text_diffs'][changed])
+
     def test_bad_records_and_unmanaged_adoption(self):
         path = self.root / record_path('admin')
         original = json.loads(path.read_bytes())
