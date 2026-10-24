@@ -1,5 +1,6 @@
 """Offline updates of reviewed source migrations; never a distribution artifact."""
 from pathlib import Path
+import difflib
 import os
 import shutil
 
@@ -116,6 +117,14 @@ def plan_source(root, source, revision, channel):
     result['diffs'] = {c['path']: {'before_sha256': digest(read(location(root, c['path']))),
                                   'after_sha256': digest(contents[c['path']])}
                        for c in result['changes']}
+    # Use the same validated bytes as the write proposal, including its record.
+    # Presentation only: the existing plan digest and exact allowlist still bind writes.
+    result['text_diffs'] = {
+        c['path']: ''.join(difflib.unified_diff(
+            read(location(root, c['path'])).decode('utf-8').splitlines(keepends=True),
+            contents[c['path']].decode('utf-8').splitlines(keepends=True),
+            fromfile='a/' + c['path'], tofile='b/' + c['path']))
+        for c in result['changes']}
     return result, contents
 
 

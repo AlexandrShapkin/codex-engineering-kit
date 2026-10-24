@@ -112,6 +112,24 @@ class SourceUpdateTests(unittest.TestCase):
         with self.assertRaises(SyncError):
             self.proposal()
 
+    def test_text_diffs_show_pinned_content_and_record_without_writes(self):
+        before = self.snapshot()
+        # An uncommitted upstream edit must never enter the pinned proposal.
+        changed = next(iter(sorted(source_map('admin').values())))
+        (self.sources['admin'] / changed).write_text('unreviewed worktree edit\n')
+        p, contents = self.proposal()
+        self.assertEqual(set(p['text_diffs']), set(p['diffs']))
+        diff = p['text_diffs'][changed]
+        self.assertIn('-reviewed ' + changed + '\n', diff)
+        self.assertIn('+reviewed upstream update\n', diff)
+        self.assertNotIn('unreviewed worktree edit', diff)
+        record_diff = p['text_diffs'][record_path('admin')]
+        self.assertIn(self.pins['admin'][0], record_diff)
+        self.assertIn(self.pins['admin'][1], record_diff)
+        self.assertEqual(before, self.snapshot())
+        self.apply('admin', self.pins['admin'][1])
+        self.assertEqual(self.proposal()[0]['text_diffs'], {})
+
     def test_bad_records_and_unmanaged_adoption(self):
         path = self.root / record_path('admin')
         original = json.loads(path.read_bytes())
