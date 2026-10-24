@@ -136,6 +136,13 @@ old bundle and the same plan/write permissions. For partial I/O failure restore
 files and lock from the pre-update verified snapshot before replanning. Neither
 channel implicitly upgrades the other; retain both full SHAs and both bundles.
 
+For existing reviewed source installations, `source-update plan` also emits
+`text_diffs`: unified text diffs keyed by changed path, including the source
+record. They use validated installed bytes and the pinned Git commit, never
+uncommitted upstream edits. Existing hash diffs, plan digest and exact write
+permissions remain authoritative. This is review presentation, not acceptance.
+Use the existing plan/write channel; no separate diff-generation tool is needed.
+
 
 ## Source licensing and protocol classification
 
