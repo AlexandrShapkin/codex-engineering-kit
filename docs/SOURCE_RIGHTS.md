@@ -1,29 +1,17 @@
-# Source rights and attribution
+# Source rights and provenance
 
-Owner decision: MIT for both canonical repositories, 2026-10-21. The root LICENSE
-covers owner-controlled code and associated documentation, including the retained
-workflow snapshots. Preserve its copyright and permission notice with copies or
-substantial portions; the six-file export formats do not carry that notice, so
-consumer licensing is an explicit project-owned migration step.
+The owner selected MIT on 2026-10-21. Root LICENSE covers owner-controlled
+source and documentation; retain its copyright and permission notice with
+copies or substantial portions. Independently owned application code and
+third-party dependencies retain their own terms.
 
-The imported material is the shared workflow/interface and agent block, not
-application source, original game assets, private infrastructure or user data.
-The [four exact source PRs/SHAs](../README.md) were compared byte for byte: all
-four common blocks and interfaces match the frozen Kit snapshots. GitHub PR
-creators, head authors and interface-history authors map to AlexandrShapkin.
-Template's retained Kit files match their pinned owner-controlled Git blobs.
-No separately owned/vendored payload or conflicting notice was found in the
-bounded history/current-tree audit. This provenance plus the owner's express MIT
-grant supports this distribution; account identity alone is not a title warranty.
+Historical shared workflow imports were owner-authored and reviewed in the
+accepted Git history. The retired bundles, pins, exports and publication audits
+are historical evidence recoverable from that history, not current adoption or
+synchronization requirements. No application source, proprietary assets,
+credentials or user data are imported by this scope correction.
 
-Python standard-library modules are imported, not vendored. Referenced GitHub
-Actions execute upstream code under its own terms; their implementations are not
-redistributed here. Product names, trademarks, external links and licenses of
-external dependencies/assets retain their owners' rights. MIT grants no rights
-to Mojang assets, third-party products, user content or secrets. No fabricated
-third-party NOTICE, patent grant or assignment is inferred.
-
-Historical author metadata, internal Issue references, source SHAs and synthetic
-local paths are useful provenance, not confirmed secrets. Retain history and pins;
-no rewrite, removal of attribution or publication of private device data is needed.
-The safety evidence and limitations are in [PUBLICATION.md](PUBLICATION.md).
+Python standard-library modules and referenced GitHub Actions are dependencies,
+not vendored implementations. Names and links confer no trademark, asset or
+third-party source rights. MIT does not license Mojang assets or private data.
+No new third-party attribution or assignment is inferred from account identity.
