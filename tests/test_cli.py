@@ -187,8 +187,6 @@ class CliTests(unittest.TestCase):
                  mock.patch("signal.setitimer", create=True, side_effect=AssertionError("timer mutation")):
                 self.assertEqual(main(["doctor"]), 0)
                 self.assertEqual(main(["context", "--root", tmp]), 0)
-                self.assertEqual(main(["checks", "--profile", "rustcraft"]), 0)
-                self.assertEqual(main(["checks", "--profile", "unknown"]), 1)
 
     def test_unavailable_git_is_not_installed(self):
         with mock.patch("shutil.which", return_value=None):
@@ -216,7 +214,7 @@ class CliTests(unittest.TestCase):
             with self.assertRaises(SystemExit) as result:
                 main(["--help"])
         self.assertEqual(result.exception.code, 0)
-        self.assertIn("{status,context,doctor,checks,bundle,distribution,sync,source-update}", output.getvalue())
+        self.assertIn("{status,context,doctor}", output.getvalue())
         self.assertNotIn("github-get", output.getvalue())
 
 
