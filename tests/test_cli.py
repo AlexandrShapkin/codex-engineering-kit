@@ -2,6 +2,7 @@
 import os
 from contextlib import redirect_stderr, redirect_stdout
 import io
+import json
 import signal
 from pathlib import Path
 import shutil
@@ -175,6 +176,14 @@ class GitFixture(unittest.TestCase):
             with self.assertRaisesRegex(ObservationError, "metadata command failed"):
                 observe(Path(directory))
 
+    def test_detached_head_reports_detached_true_and_hex_sha(self):
+        sha = local_git(self.root, "rev-parse", "HEAD")
+        local_git(self.root, "checkout", "-q", "--detach", sha)
+        result = observe(self.root)
+        self.assertIs(result["detached"], True)
+        self.assertIs(result["branch"], None)
+        self.assertRegex(result["head_sha"], r"^[0-9a-f]{40,64}$")
+
 
 class CliTests(unittest.TestCase):
     def test_offline_commands_never_spawn_or_open_network(self):
@@ -185,8 +194,9 @@ class CliTests(unittest.TestCase):
                  mock.patch("socket.create_connection", side_effect=AssertionError("network")), \
                  mock.patch("signal.signal", side_effect=AssertionError("handler mutation")), \
                  mock.patch("signal.setitimer", create=True, side_effect=AssertionError("timer mutation")):
-                self.assertEqual(main(["doctor"]), 0)
-                self.assertEqual(main(["context", "--root", tmp]), 0)
+                with redirect_stdout(io.StringIO()):
+                    self.assertEqual(main(["doctor"]), 0)
+                    self.assertEqual(main(["context", "--root", tmp]), 0)
 
     def test_unavailable_git_is_not_installed(self):
         with mock.patch("shutil.which", return_value=None):
@@ -216,6 +226,30 @@ class CliTests(unittest.TestCase):
         self.assertEqual(result.exception.code, 0)
         self.assertIn("{status,context,doctor}", output.getvalue())
         self.assertNotIn("github-get", output.getvalue())
+
+    def test_status_non_repository_returns_error_envelope(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with redirect_stdout(io.StringIO()) as output, \
+                 redirect_stderr(io.StringIO()) as errors:
+                code = main(["status", "--root", directory])
+        self.assertEqual(code, 1)
+        payload = json.loads(output.getvalue())
+        self.assertIs(payload["ok"], False)
+        self.assertIsInstance(payload["error"], str)
+        self.assertTrue(payload["error"])
+        self.assertEqual(errors.getvalue(), "")
+
+    def test_context_missing_root_returns_error_envelope(self):
+        with tempfile.TemporaryDirectory() as directory:
+            missing = str(Path(directory) / "missing")
+            with redirect_stdout(io.StringIO()) as output, \
+                 redirect_stderr(io.StringIO()) as errors:
+                code = main(["context", "--root", missing])
+        self.assertEqual(code, 1)
+        payload = json.loads(output.getvalue())
+        self.assertIs(payload["ok"], False)
+        self.assertIn("context root", payload["error"])
+        self.assertEqual(errors.getvalue(), "")
 
 
 if __name__ == "__main__":
